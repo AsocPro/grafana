@@ -12,7 +12,6 @@ import { DashboardEditPaneSplitter } from '../edit-pane/DashboardEditPaneSplitte
 
 import { DashboardScene } from './DashboardScene';
 import { PanelSearchLayout } from './PanelSearchLayout';
-import { DashboardAngularDeprecationBanner } from './angular/DashboardAngularDeprecationBanner';
 
 export function DashboardSceneRenderer({ model }: SceneComponentProps<DashboardScene>) {
   const { controls, overlay, editview, editPanel, isEmpty, viewPanelScene, panelSearch, panelsPerRow, isEditing } =
@@ -55,7 +54,6 @@ export function DashboardSceneRenderer({ model }: SceneComponentProps<DashboardS
 
     return (
       <>
-        <DashboardAngularDeprecationBanner dashboard={model} key="angular-deprecation-banner" />
         {isEmpty && (
           <DashboardEmpty dashboard={model} canCreate={!!model.state.meta.canEdit} key="dashboard-empty-state" />
         )}

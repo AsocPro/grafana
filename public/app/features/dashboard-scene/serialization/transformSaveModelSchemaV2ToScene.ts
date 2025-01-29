@@ -82,7 +82,6 @@ import { panelLinksBehavior, panelMenuBehavior } from '../scene/PanelMenuBehavio
 import { PanelNotices } from '../scene/PanelNotices';
 import { PanelTimeRange } from '../scene/PanelTimeRange';
 import { RowRepeaterBehavior } from '../scene/RowRepeaterBehavior';
-import { AngularDeprecation } from '../scene/angular/AngularDeprecation';
 import { DashboardGridItem } from '../scene/layout-default/DashboardGridItem';
 import { DefaultGridLayoutManager } from '../scene/layout-default/DefaultGridLayoutManager';
 import { RowActions } from '../scene/row-actions/RowActions';
@@ -309,10 +308,6 @@ function createSceneGridLayoutForItems(dashboard: DashboardV2Spec): SceneGridIte
 function buildLibraryPanel(panel: LibraryPanelKind): VizPanel {
   const titleItems: SceneObject[] = [];
 
-  if (config.featureToggles.angularDeprecationUI) {
-    titleItems.push(new AngularDeprecation());
-  }
-
   titleItems.push(
     new VizPanelLinks({
       rawLinks: [],
@@ -352,10 +347,6 @@ function buildLibraryPanel(panel: LibraryPanelKind): VizPanel {
 
 function buildVizPanel(panel: PanelKind): VizPanel {
   const titleItems: SceneObject[] = [];
-
-  if (config.featureToggles.angularDeprecationUI) {
-    titleItems.push(new AngularDeprecation());
-  }
 
   titleItems.push(
     new VizPanelLinks({
