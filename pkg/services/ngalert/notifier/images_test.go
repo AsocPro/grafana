@@ -2,7 +2,6 @@ package notifier
 
 import (
 	"context"
-	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -11,177 +10,108 @@ import (
 	alertingImages "github.com/grafana/alerting/images"
 	alertingModels "github.com/grafana/alerting/models"
 	alertingNotify "github.com/grafana/alerting/notify"
+	"github.com/prometheus/common/model"
+	"github.com/stretchr/testify/require"
+
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
 	"github.com/grafana/grafana/pkg/services/ngalert/store"
-	"github.com/prometheus/common/model"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGetImage(t *testing.T) {
-	fakeImageStore := store.NewFakeImageStore(t)
-	store := newImageProvider(fakeImageStore, log.NewNopLogger())
+	testBytes := []byte("some test bytes")
+	testPath := generateTestFile(t, testBytes)
 
-	t.Run("queries by token when it gets a token", func(tt *testing.T) {
-		img := models.Image{
-			Token: "test",
-			URL:   "http://localhost:1234",
-			Path:  "test.png",
-		}
-		err := fakeImageStore.SaveImage(context.Background(), &img)
-		require.NoError(tt, err)
-
-		// nolint:staticcheck
-		savedImg, err := store.GetImage(context.Background(), "token://"+img.Token)
-		require.NoError(tt, err)
-		require.Equal(tt, savedImg.Token, img.Token)
-		require.Equal(tt, savedImg.URL, img.URL)
-		require.Equal(tt, savedImg.Path, img.Path)
-	})
-
-	t.Run("queries by URL when it gets a URL", func(tt *testing.T) {
-		img := models.Image{
-			Token: "test",
-			Path:  "test.png",
-			URL:   "https://test.com/test.png",
-		}
-		err := fakeImageStore.SaveImage(context.Background(), &img)
-		require.NoError(tt, err)
-
-		// nolint:staticcheck
-		savedImg, err := store.GetImage(context.Background(), img.URL)
-		require.NoError(tt, err)
-		require.Equal(tt, savedImg.Token, img.Token)
-		require.Equal(tt, savedImg.URL, img.URL)
-		require.Equal(tt, savedImg.Path, img.Path)
-	})
-}
-
-func TestGetImageURL(t *testing.T) {
 	var (
-		imageWithoutURL = models.Image{
-			Token:     "test-no-url",
-			CreatedAt: time.Now().UTC(),
-			ExpiresAt: time.Now().UTC().Add(24 * time.Hour),
-		}
-		testImage = models.Image{
-			Token:     "test",
+		imageWithoutPath = models.Image{
+			Token:     "test-token-no-path",
 			URL:       "https://test.com",
 			CreatedAt: time.Now().UTC(),
 			ExpiresAt: time.Now().UTC().Add(24 * time.Hour),
 		}
-	)
-
-	fakeImageStore := store.NewFakeImageStore(t, &imageWithoutURL, &testImage)
-	store := newImageProvider(fakeImageStore, log.NewNopLogger())
-
-	tests := []struct {
-		name   string
-		uri    string
-		expURL string
-		expErr error
-	}{
-		{
-			"URL does not exist",
-			"https://invalid.com/test",
-			"",
-			alertingImages.ErrImageNotFound,
-		}, {
-			"existing URL",
-			testImage.URL,
-			testImage.URL,
-			nil,
-		}, {
-			"token does not exist",
-			"token://invalid",
-			"",
-			alertingImages.ErrImageNotFound,
-		}, {
-			"existing token",
-			"token://" + testImage.Token,
-			testImage.URL,
-			nil,
-		}, {
-			"image has no URL",
-			"token://" + imageWithoutURL.Token,
-			"",
-			alertingImages.ErrImagesNoURL,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(tt *testing.T) {
-			alert := alertingNotify.Alert{
-				Alert: model.Alert{
-					Annotations: model.LabelSet{alertingModels.ImageTokenAnnotation: model.LabelValue(test.uri)},
-				},
-			}
-			url, err := store.GetImageURL(context.Background(), &alert)
-			require.ErrorIs(tt, err, test.expErr)
-			require.Equal(tt, test.expURL, url)
-		})
-	}
-}
-
-func TestGetRawImage(t *testing.T) {
-	var (
-		testBytes        = []byte("some test bytes")
-		testPath         = generateTestFile(t, testBytes)
-		imageWithoutPath = models.Image{
-			Token:     "test-no-path",
-			URL:       "https://test-no-path.com",
-			CreatedAt: time.Now().UTC(),
-			ExpiresAt: time.Now().UTC().Add(24 * time.Hour),
-		}
 		testImage = models.Image{
-			Token:     "test",
+			Token:     "test-token",
 			URL:       "https://test.com",
 			Path:      testPath,
 			CreatedAt: time.Now().UTC(),
 			ExpiresAt: time.Now().UTC().Add(24 * time.Hour),
 		}
+		testImageMissingFile = models.Image{
+			Token:     "test-token-missing-file",
+			URL:       "https://test.com",
+			Path:      "/tmp/missing/1234asdf.png",
+			CreatedAt: time.Now().UTC(),
+			ExpiresAt: time.Now().UTC().Add(24 * time.Hour),
+		}
 	)
 
-	fakeImageStore := store.NewFakeImageStore(t, &imageWithoutPath, &testImage)
+	fakeImageStore := store.NewFakeImageStore(t, &imageWithoutPath, &testImage, &testImageMissingFile)
 	store := newImageProvider(fakeImageStore, log.NewNopLogger())
 
 	tests := []struct {
-		name        string
-		uri         string
-		expFilename string
-		expBytes    []byte
-		expErr      error
+		name          string
+		uri           string
+		expImage      *alertingImages.Image
+		expRawData    []byte
+		expRawDataErr error
 	}{
 		{
-			"URL does not exist",
-			"https://invalid.com/test",
-			"",
-			nil,
-			alertingImages.ErrImageNotFound,
+			name: "Given existing raw token, expect image",
+			uri:  testImage.Token,
+			expImage: &alertingImages.Image{
+				Name: filepath.Base(testImage.Path),
+				URL:  testImage.URL,
+			},
 		}, {
-			"existing URL",
-			testImage.URL,
-			filepath.Base(testPath),
-			testBytes,
-			nil,
+			name: "Given existing combined token, expect image",
+			uri:  alertingImages.ImageURI{Token: testImage.Token, URL: testImage.URL}.Annotation(),
+			expImage: &alertingImages.Image{
+				Name: filepath.Base(testImage.Path),
+				URL:  testImage.URL,
+			},
 		}, {
-			"token does not exist",
-			"token://invalid",
-			"",
-			nil,
-			alertingImages.ErrImageNotFound,
+			name: "Given existing combined token with just token, expect image",
+			uri:  alertingImages.ImageURI{Token: testImage.Token}.Annotation(),
+			expImage: &alertingImages.Image{
+				Name: filepath.Base(testImage.Path),
+				URL:  testImage.URL,
+			},
 		}, {
-			"existing token",
-			"token://" + testImage.Token,
-			filepath.Base(testPath),
-			testBytes,
-			nil,
+			name:     "Given existing combined token with just url, expect nil",
+			uri:      alertingImages.ImageURI{URL: testImage.URL}.Annotation(),
+			expImage: nil,
 		}, {
-			"image has no path",
-			"token://" + imageWithoutPath.Token,
-			"",
-			nil,
-			alertingImages.ErrImagesNoPath,
+			name:     "Given missing raw token, expect nil",
+			uri:      "invalid",
+			expImage: nil,
+		}, {
+			name:     "Given missing combined token, expect nil",
+			uri:      alertingImages.ImageURI{Token: "invalid"}.Annotation(),
+			expImage: nil,
+		}, {
+			name: "Given image with Path, expect RawData",
+			uri:  alertingImages.ImageURI{Token: testImage.Token}.Annotation(),
+			expImage: &alertingImages.Image{
+				Name: filepath.Base(testImage.Path),
+				URL:  testImage.URL,
+			},
+			expRawData: testBytes,
+		}, {
+			name: "Given image with Path but file doesn't exist, expect RawData error",
+			uri:  alertingImages.ImageURI{Token: testImageMissingFile.Token}.Annotation(),
+			expImage: &alertingImages.Image{
+				Name: filepath.Base(testImageMissingFile.Path),
+				URL:  testImageMissingFile.URL,
+			},
+			expRawDataErr: models.ErrImageNotFound,
+		}, {
+			name: "Given image without Path, expect RawData error",
+			uri:  alertingImages.ImageURI{Token: imageWithoutPath.Token}.Annotation(),
+			expImage: &alertingImages.Image{
+				Name: imageWithoutPath.Token,
+				URL:  imageWithoutPath.URL,
+			},
+			expRawDataErr: models.ErrImageDataUnavailable,
 		},
 	}
 
@@ -192,15 +122,23 @@ func TestGetRawImage(t *testing.T) {
 					Annotations: model.LabelSet{alertingModels.ImageTokenAnnotation: model.LabelValue(test.uri)},
 				},
 			}
-			readCloser, filename, err := store.GetRawImage(context.Background(), &alert)
-			require.ErrorIs(tt, err, test.expErr)
-			require.Equal(tt, test.expFilename, filename)
-
-			if test.expBytes != nil {
-				b, err := io.ReadAll(readCloser)
+			image, err := store.GetImage(context.Background(), alert)
+			require.NoError(tt, err)
+			if test.expImage == nil {
+				require.Nil(tt, image)
+				return
+			}
+			require.Equal(tt, test.expImage.URL, image.URL)
+			require.Equal(tt, test.expImage.Name, image.Name)
+			if test.expRawData != nil {
+				b, err := image.RawData(context.Background())
 				require.NoError(tt, err)
-				require.Equal(tt, test.expBytes, b)
-				require.NoError(t, readCloser.Close())
+				require.Equal(tt, test.expRawData, b)
+			}
+			if test.expRawDataErr != nil {
+				b, err := image.RawData(context.Background())
+				require.ErrorIs(tt, err, test.expRawDataErr)
+				require.Nil(tt, b)
 			}
 		})
 	}

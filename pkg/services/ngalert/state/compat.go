@@ -9,6 +9,7 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/go-openapi/strfmt"
+	alertingImages "github.com/grafana/alerting/images"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/prometheus/alertmanager/api/v2/models"
 	"github.com/prometheus/common/model"
@@ -17,6 +18,7 @@ import (
 
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
 	"github.com/grafana/grafana/pkg/services/ngalert/eval"
+	ngModels "github.com/grafana/grafana/pkg/services/ngalert/models"
 )
 
 const (
@@ -48,8 +50,11 @@ func StateToPostableAlert(transition StateTransition, appURL *url.URL) *models.P
 		nA[alertingModels.ValueStringAnnotation] = alertState.LastEvaluationString
 	}
 
-	if alertState.Image != nil && alertState.Image.Token != "" {
-		nA[alertingModels.ImageTokenAnnotation] = alertState.Image.Token
+	if alertState.Image != nil {
+		imageURI := generateImageURI(alertState.Image)
+		if imageURI != "" {
+			nA[alertingModels.ImageTokenAnnotation] = imageURI
+		}
 	}
 
 	if alertState.StateReason != "" {
@@ -152,4 +157,12 @@ func FromAlertsStateToStoppedAlert(firingStates []StateTransition, appURL *url.U
 		alerts.PostableAlerts = append(alerts.PostableAlerts, *postableAlert)
 	}
 	return alerts
+}
+
+// generateImageURI returns a string that serves as an identifier for the image.
+func generateImageURI(image *ngModels.Image) string {
+	return alertingImages.ImageURI{
+		URL:   image.URL,
+		Token: image.Token,
+	}.Annotation()
 }
