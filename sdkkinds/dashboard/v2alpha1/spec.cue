@@ -1,18 +1,10 @@
-package dashboard
+package v2alpha1
 
-v2: {
-	"v2alpha1": {
-		schema: {
-			spec: #DashboardSpec
-		}
-	}
-}
+import (
+	"github.com/grafana/grafana/sdkkinds/dashboard/common"
+)
 
-#DashboardSpec: {
-	// Unique numeric identifier for the dashboard.
-	// `id` is internal to a specific Grafana instance. `uid` should be used to identify a dashboard across Grafana instances.
-	id?: int64
-
+DashboardSpec: {
 	// Title of dashboard.
 	title: string
 
@@ -23,7 +15,7 @@ v2: {
 	// "Off" for no shared crosshair or tooltip (default).
 	// "Crosshair" for shared crosshair.
 	// "Tooltip" for shared crosshair AND shared tooltip.
-	cursorSync: #DashboardCursorSync
+	cursorSync: DashboardCursorSync
 
 	// When set to true, the dashboard will redraw panels at an interval matching the pixel width.
 	// This will keep data "moving left" regardless of the query refresh rate. This setting helps
@@ -37,32 +29,55 @@ v2: {
 	editable?: bool | *true
 
 	// Links with references to other dashboards or external websites.
-	links: [...#DashboardLink]
+	links: [...DashboardLink]
 
 	// Tags associated with dashboard.
-	tags?: [...string]
+	tags: [...string]
 
-	timeSettings: #TimeSettingsSpec
+	timeSettings: TimeSettingsSpec
 
 	// Configured template variables.
-	variables: [...#QueryVariableKind | #TextVariableKind | #ConstantVariableKind | #DatasourceVariableKind | #IntervalVariableKind | #CustomVariableKind | #GroupByVariableKind | #AdhocVariableKind]
+	variables: [...VariableKind]
 
-	elements: [#ElementReference.name]: #PanelKind // |* more element types in the future
+	elements: [ElementReference.name]: Element
 
-	annotations: [...#AnnotationQueryKind]
+	annotations: [...AnnotationQueryKind]
 
-	layout: #GridLayoutKind
+	layout: GridLayoutKind
 
-	// Version of the JSON schema, incremented each time a Grafana update brings
-	// changes to said schema.
-	schemaVersion: uint16 | *39
-
-	// version: will rely on k8s resource versioning, via metadata.resorceVersion
-	// revision?: int // for plugins only
-	// gnetId?: string // ??? Wat is this used for?
+	// Plugins only. The version of the dashboard installed together with the plugin.
+	// This is used to determine if the dashboard should be updated when the plugin is updated.
+	revision?: uint16
 }
 
-#AnnotationPanelFilter: {
+// Supported dashboard elements
+Element: PanelKind | LibraryPanelKind // |* more element types in the future
+
+LibraryPanelKind: {
+	kind: "LibraryPanel"
+	spec: LibraryPanelSpec
+}
+
+LibraryPanelSpec: {
+	// Panel ID for the library panel in the dashboard
+	id: number
+	// Title for the library panel in the dashboard
+	title: string
+
+	libraryPanel: LibraryPanelRef
+}
+
+// A library panel is a reusable panel that you can use in any dashboard.
+// When you make a change to a library panel, that change propagates to all instances of where the panel is used.
+// Library panels streamline reuse of panels across multiple dashboards.
+LibraryPanelRef: {
+	// Library panel name
+	name: string
+	// Library panel uid
+	uid: string
+}
+
+AnnotationPanelFilter: {
 	// Should the specified panels be included or excluded
 	exclude?: bool | *false
 
@@ -73,15 +88,15 @@ v2: {
 // "Off" for no shared crosshair or tooltip (default).
 // "Crosshair" for shared crosshair.
 // "Tooltip" for shared crosshair AND shared tooltip.
-#DashboardCursorSync: "Off" | "Crosshair" | "Tooltip" @cuetsy(kind="enum")
+DashboardCursorSync: "Off" | "Crosshair" | "Tooltip"
 
 // Links with references to other dashboards or external resources
-#DashboardLink: {
+DashboardLink: {
 	// Title to display with the link
 	title: string
 	// Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
 	// FIXME: The type is generated as `type: DashboardLinkType | dashboardLinkType.Link;` but it should be `type: DashboardLinkType`
-	type: #DashboardLinkType
+	type: DashboardLinkType
 	// Icon name to be displayed with the link
 	icon: string
 	// Tooltip to display when the user hovers their mouse over it
@@ -100,7 +115,7 @@ v2: {
 	keepTime: bool | *false
 }
 
-#DataSourceRef: {
+DataSourceRef: {
 	// The plugin type-id
 	type?: string
 
@@ -108,30 +123,24 @@ v2: {
 	uid?: string
 }
 
-//
-// A topic is attached to DataFrame metadata in query results.
-// This specifies where the data should be used.
-//
-#DataTopic: "series" | "annotations" | "alertStates" @cuetsy(kind="enum",memberNames="Series|Annotations|AlertStates")
-
 // Transformations allow to manipulate data returned by a query before the system applies a visualization.
 // Using transformations you can: rename fields, join time series data, perform mathematical operations across queries,
 // use the output of one transformation as the input to another transformation, etc.
-#DataTransformerConfig: {
+DataTransformerConfig: {
 	// Unique identifier of transformer
 	id: string
 	// Disabled transformations are skipped
 	disabled?: bool
 	// Optional frame matcher. When missing it will be applied to all results
-	filter?: #MatcherConfig
+	filter?: MatcherConfig
 	// Where to pull DataFrames from as input to transformation
-	topic?: #DataTopic
+	topic?: common.DataTopic
 	// Options to be passed to the transformer
 	// Valid options depend on the transformer id
 	options: _
 }
 
-#DataLink: {
+DataLink: {
 	title:        string
 	url:          string
 	targetBlank?: bool
@@ -140,20 +149,20 @@ v2: {
 // The data model used in Grafana, namely the data frame, is a columnar-oriented table structure that unifies both time series and table query results.
 // Each column within this structure is called a field. A field can represent a single time series or table column.
 // Field options allow you to change how the data is displayed in your visualizations.
-#FieldConfigSource: {
+FieldConfigSource: {
 	// Defaults are the options applied to all fields.
-	defaults: #FieldConfig
+	defaults: FieldConfig
 	// Overrides are the options applied to specific fields overriding the defaults.
 	overrides: [...{
-		matcher: #MatcherConfig
-		properties: [...#DynamicConfigValue]
+		matcher: MatcherConfig
+		properties: [...DynamicConfigValue]
 	}]
 }
 
 // The data model used in Grafana, namely the data frame, is a columnar-oriented table structure that unifies both time series and table query results.
 // Each column within this structure is called a field. A field can represent a single time series or table column.
 // Field options allow you to change how the data is displayed in your visualizations.
-#FieldConfig: {
+FieldConfig: {
 	// The display value for this field.  This supports template variables blank is auto
 	displayName?: string
 
@@ -201,13 +210,13 @@ v2: {
 	max?: number
 
 	// Convert input values into a display string
-	mappings?: [...#ValueMapping]
+	mappings?: [...ValueMapping]
 
 	// Map numeric values to states
-	thresholds?: #ThresholdsConfig
+	thresholds?: ThresholdsConfig
 
 	// Panel color configuration
-	color?: #FieldColor
+	color?: FieldColor
 
 	// The behavior when clicking on a result
 	links?: [...]
@@ -220,53 +229,53 @@ v2: {
 	custom?: {...}
 }
 
-#DynamicConfigValue: {
+DynamicConfigValue: {
 	id:     string | *""
 	value?: _
 }
 
 // Matcher is a predicate configuration. Based on the config a set of field(s) or values is filtered in order to apply override / transformation.
 // It comes with in id ( to resolve implementation from registry) and a configuration that’s specific to a particular matcher type.
-#MatcherConfig: {
+MatcherConfig: {
 	// The matcher id. This is used to find the matcher implementation from registry.
 	id: string | *""
 	// The matcher options. This is specific to the matcher implementation.
 	options?: _
 }
 
-#Threshold: {
+Threshold: {
 	value: number
 	color: string
 }
 
-#ThresholdsMode: "absolute" | "percentage"
+ThresholdsMode: "absolute" | "percentage"
 
-#ThresholdsConfig: {
-	mode: #ThresholdsMode
-	steps: [...#Threshold]
+ThresholdsConfig: {
+	mode: ThresholdsMode
+	steps: [...Threshold]
 }
 
-#ValueMapping: #ValueMap | #RangeMap | #RegexMap | #SpecialValueMap
+ValueMapping: ValueMap | RangeMap | RegexMap | SpecialValueMap
 
 // Supported value mapping types
 // `value`: Maps text values to a color or different display text and color. For example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.
 // `range`: Maps numerical ranges to a display text and color. For example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.
 // `regex`: Maps regular expressions to replacement text and a color. For example, if a value is www.example.com, you can configure a regex value mapping so that Grafana displays www and truncates the domain.
 // `special`: Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color. See SpecialValueMatch to see the list of special values. For example, you can configure a special value mapping so that null values appear as N/A.
-#MappingType: "value" | "range" | "regex" | "special" @cog(kind="enum",memberNames="ValueToText|RangeToText|RegexToText|SpecialValue")
+MappingType: "value" | "range" | "regex" | "special" @cog(kind="enum",memberNames="ValueToText|RangeToText|RegexToText|SpecialValue")
 
 // Maps text values to a color or different display text and color.
 // For example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.
-#ValueMap: {
-	type: #MappingType & "value"
+ValueMap: {
+	type: MappingType & "value"
 	// Map with <value_to_match>: ValueMappingResult. For example: { "10": { text: "Perfection!", color: "green" } }
-	options: [string]: #ValueMappingResult
+	options: [string]: ValueMappingResult
 }
 
 // Maps numerical ranges to a display text and color.
 // For example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.
-#RangeMap: {
-	type: #MappingType & "range"
+RangeMap: {
+	type: MappingType & "range"
 	// Range to match against and the result to apply when the value is within the range
 	options: {
 		// Min value of the range. It can be null which means -Infinity
@@ -274,41 +283,41 @@ v2: {
 		// Max value of the range. It can be null which means +Infinity
 		to: float64 | null
 		// Config to apply when the value is within the range
-		result: #ValueMappingResult
+		result: ValueMappingResult
 	}
 }
 
 // Maps regular expressions to replacement text and a color.
 // For example, if a value is www.example.com, you can configure a regex value mapping so that Grafana displays www and truncates the domain.
-#RegexMap: {
-	type: #MappingType & "regex"
+RegexMap: {
+	type: MappingType & "regex"
 	// Regular expression to match against and the result to apply when the value matches the regex
 	options: {
 		// Regular expression to match against
 		pattern: string
 		// Config to apply when the value matches the regex
-		result: #ValueMappingResult
+		result: ValueMappingResult
 	}
 }
 
 // Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color.
 // See SpecialValueMatch to see the list of special values.
 // For example, you can configure a special value mapping so that null values appear as N/A.
-#SpecialValueMap: {
-	type: #MappingType & "special"
+SpecialValueMap: {
+	type: MappingType & "special"
 	options: {
 		// Special value to match against
-		match: #SpecialValueMatch
+		match: SpecialValueMatch
 		// Config to apply when the value matches the special value
-		result: #ValueMappingResult
+		result: ValueMappingResult
 	}
 }
 
 // Special value types supported by the `SpecialValueMap`
-#SpecialValueMatch: "true" | "false" | "null" | "nan" | "null+nan" | "empty" @cog(kind="enum",memberNames="True|False|Null|NaN|NullAndNaN|Empty")
+SpecialValueMatch: "true" | "false" | "null" | "nan" | "null+nan" | "empty" @cog(kind="enum",memberNames="True|False|Null|NaN|NullAndNaN|Empty")
 
 // Result used as replacement with text and color when the value matches
-#ValueMappingResult: {
+ValueMappingResult: {
 	// Text to display when the value matches
 	text?: string
 	// Text to use when the value matches
@@ -337,54 +346,61 @@ v2: {
 // `continuous-purples`: Continuous Purple palette mode
 // `shades`: Shades of a single color. Specify a single color, useful in an override rule.
 // `fixed`: Fixed color mode. Specify a single color, useful in an override rule.
-#FieldColorModeId: "thresholds" | "palette-classic" | "palette-classic-by-name" | "continuous-GrYlRd" | "continuous-RdYlGr" | "continuous-BlYlRd" | "continuous-YlRd" | "continuous-BlPu" | "continuous-YlBl" | "continuous-blues" | "continuous-reds" | "continuous-greens" | "continuous-purples" | "fixed" | "shades"
+FieldColorModeId: "thresholds" | "palette-classic" | "palette-classic-by-name" | "continuous-GrYlRd" | "continuous-RdYlGr" | "continuous-BlYlRd" | "continuous-YlRd" | "continuous-BlPu" | "continuous-YlBl" | "continuous-blues" | "continuous-reds" | "continuous-greens" | "continuous-purples" | "fixed" | "shades"
 
 // Defines how to assign a series color from "by value" color schemes. For example for an aggregated data points like a timeseries, the color can be assigned by the min, max or last value.
-#FieldColorSeriesByMode: "min" | "max" | "last"
+FieldColorSeriesByMode: "min" | "max" | "last"
 
 // Map a field to a color.
-#FieldColor: {
+FieldColor: {
 	// The main color scheme mode.
-	mode: #FieldColorModeId
+	mode: FieldColorModeId
 	// The fixed color value for fixed or shades color modes.
 	fixedColor?: string
 	// Some visualizations need to know how to assign a series color from by value color schemes.
-	seriesBy?: #FieldColorSeriesByMode
+	seriesBy?: FieldColorSeriesByMode
 }
 
 // Dashboard Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
-#DashboardLinkType: "link" | "dashboards" @cuetsy(kind="enum")
+DashboardLinkType: "link" | "dashboards"
+
+// --- Common types ---
+Kind: {
+	kind:      string
+	spec:      _
+	metadata?: _
+}
 
 // --- Kinds ---
-#VizConfigSpec: {
+VizConfigSpec: {
 	pluginVersion: string
 	options: [string]: _
-	fieldConfig: #FieldConfigSource
+	fieldConfig: FieldConfigSource
 }
 
-#VizConfigKind: {
+VizConfigKind: {
 	// The kind of a VizConfigKind is the plugin ID
 	kind: string
-	spec: #VizConfigSpec
+	spec: VizConfigSpec
 }
 
-#AnnotationQuerySpec: {
-	datasource?: #DataSourceRef
-	query:       #DataQueryKind
-	builtIn?:    bool
+AnnotationQuerySpec: {
+	datasource?: DataSourceRef
+	query?:      DataQueryKind
 	enable:      bool
-	filter:      #AnnotationPanelFilter
 	hide:        bool
 	iconColor:   string
 	name:        string
+	builtIn?:    bool | *false
+	filter?:     AnnotationPanelFilter
 }
 
-#AnnotationQueryKind: {
+AnnotationQueryKind: {
 	kind: "AnnotationQuery"
-	spec: #AnnotationQuerySpec
+	spec: AnnotationQuerySpec
 }
 
-#QueryOptionsSpec: {
+QueryOptionsSpec: {
 	timeFrom?:         string
 	maxDataPoints?:    int
 	timeShift?:        string
@@ -394,45 +410,45 @@ v2: {
 	hideTimeOverride?: bool
 }
 
-#DataQueryKind: {
+DataQueryKind: {
 	// The kind of a DataQueryKind is the datasource type
 	kind: string
 	spec: [string]: _
 }
 
-#PanelQuerySpec: {
-	query:       #DataQueryKind
-	datasource?: #DataSourceRef
+PanelQuerySpec: {
+	query:       DataQueryKind
+	datasource?: DataSourceRef
 
 	refId:  string
 	hidden: bool
 }
 
-#PanelQueryKind: {
+PanelQueryKind: {
 	kind: "PanelQuery"
-	spec: #PanelQuerySpec
+	spec: PanelQuerySpec
 }
 
-#TransformationKind: {
+TransformationKind: {
 	// The kind of a TransformationKind is the transformation ID
 	kind: string
-	spec: #DataTransformerConfig
+	spec: DataTransformerConfig
 }
 
-#QueryGroupSpec: {
-	queries: [...#PanelQueryKind]
-	transformations: [...#TransformationKind]
-	queryOptions: #QueryOptionsSpec
+QueryGroupSpec: {
+	queries: [...PanelQueryKind]
+	transformations: [...TransformationKind]
+	queryOptions: QueryOptionsSpec
 }
 
-#QueryGroupKind: {
+QueryGroupKind: {
 	kind: "QueryGroup"
-	spec: #QueryGroupSpec
+	spec: QueryGroupSpec
 }
 
 // Time configuration
 // It defines the default time config for the time picker, the refresh picker for the specific dashboard.
-#TimeSettingsSpec: {
+TimeSettingsSpec: {
 	// Timezone of dashboard. Accepted values are IANA TZDB zone ID or "browser" or "utc".
 	timezone?: string | *"browser"
 	// Start time range for dashboard.
@@ -457,44 +473,72 @@ v2: {
 	nowDelay?: string // v1: timepicker.nowDelay
 }
 
-#GridLayoutItemSpec: {
+RepeatMode: "variable" // other repeat modes will be added in the future: label, frame
+
+RepeatOptions: {
+	mode:       RepeatMode
+	value:      string
+	direction?: "h" | "v"
+	maxPerRow?: int
+}
+
+RowRepeatOptions: {
+	mode:  RepeatMode
+	value: string
+}
+
+GridLayoutItemSpec: {
 	x:       int
 	y:       int
 	width:   int
 	height:  int
-	element: #ElementReference // reference to a PanelKind from dashboard.spec.elements Expressed as JSON Schema reference
+	element: ElementReference // reference to a PanelKind from dashboard.spec.elements Expressed as JSON Schema reference
+	repeat?: RepeatOptions
 }
 
-#GridLayoutItemKind: {
+GridLayoutItemKind: {
 	kind: "GridLayoutItem"
-	spec: #GridLayoutItemSpec
+	spec: GridLayoutItemSpec
 }
 
-#GridLayoutSpec: {
-	items: [...#GridLayoutItemKind]
+GridLayoutRowKind: {
+	kind: "GridLayoutRow"
+	spec: GridLayoutRowSpec
 }
 
-#GridLayoutKind: {
+GridLayoutRowSpec: {
+	y:         int
+	collapsed: bool
+	title:     string
+	elements: [...GridLayoutItemKind] // Grid items in the row will have their Y value be relative to the rows Y value. This means a panel positioned at Y: 0 in a row with Y: 10 will be positioned at Y: 11 (row header has a heigh of 1) in the dashboard.
+	repeat?:                          RowRepeatOptions
+}
+
+GridLayoutSpec: {
+	items: [...GridLayoutItemKind | GridLayoutRowKind]
+}
+
+GridLayoutKind: {
 	kind: "GridLayout"
-	spec: #GridLayoutSpec
+	spec: GridLayoutSpec
 }
 
-#PanelSpec: {
+PanelSpec: {
 	id:          number
 	title:       string
 	description: string
-	links: [...#DataLink]
-	data:         #QueryGroupKind
-	vizConfig:    #VizConfigKind
+	links: [...DataLink]
+	data:         QueryGroupKind
+	vizConfig:    VizConfigKind
 	transparent?: bool
 }
 
-#PanelKind: {
+PanelKind: {
 	kind: "Panel"
-	spec: #PanelSpec
+	spec: PanelSpec
 }
 
-#ElementReference: {
+ElementReference: {
 	kind: "ElementReference"
 	name: string
 }
@@ -504,34 +548,34 @@ v2: {
 // should we make them conditional in the new schema as well? or should we make them required but default to false?
 
 // Variable types
-#VariableValue: #VariableValueSingle | [...#VariableValueSingle]
+VariableValue: VariableValueSingle | [...VariableValueSingle]
 
-#VariableValueSingle: string | bool | number | #CustomVariableValue
+VariableValueSingle: string | bool | number | CustomVariableValue
 
 // Custom formatter variable
-#CustomFormatterVariable: {
+CustomFormatterVariable: {
 	name:       string
-	type:       #VariableType
+	type:       VariableType
 	multi:      bool
 	includeAll: bool
 }
 
 // Custom variable value
-#CustomVariableValue: {
+CustomVariableValue: {
 	// The format name or function used in the expression
-	formatter: *null | string | #VariableCustomFormatterFn
+	formatter: *null | string | VariableCustomFormatterFn
 }
 
 // Custom formatter function
-#VariableCustomFormatterFn: {
+VariableCustomFormatterFn: {
 	value: _
 	legacyVariableModel: {
 		name:       string
-		type:       #VariableType
+		type:       VariableType
 		multi:      bool
 		includeAll: bool
 	}
-	legacyDefaultFormatter?: #VariableCustomFormatterFn
+	legacyDefaultFormatter?: VariableCustomFormatterFn
 }
 
 // Dashboard variable type
@@ -543,7 +587,10 @@ v2: {
 // `textbox`: Display a free text input field with an optional default value.
 // `custom`: Define the variable options manually using a comma-separated list.
 // `system`: Variables defined by Grafana. See: https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/#global-variables
-#VariableType: "query" | "adhoc" | "groupby" | "constant" | "datasource" | "interval" | "textbox" | "custom" | "system" | "snapshot" @cuetsy(kind="enum")
+VariableType: "query" | "adhoc" | "groupby" | "constant" | "datasource" | "interval" | "textbox" | "custom" |
+	"system" | "snapshot"
+
+VariableKind: QueryVariableKind | TextVariableKind | ConstantVariableKind | DatasourceVariableKind | IntervalVariableKind | CustomVariableKind | GroupByVariableKind | AdhocVariableKind
 
 // Sort variable options
 // Accepted values are:
@@ -557,27 +604,27 @@ v2: {
 // `naturalAsc`: Natural ASC
 // `naturalDesc`: Natural DESC
 // VariableSort enum with default value
-#VariableSort: "disabled" | "alphabeticalAsc" | "alphabeticalDesc" | "numericalAsc" | "numericalDesc" | "alphabeticalCaseInsensitiveAsc" | "alphabeticalCaseInsensitiveDesc" | "naturalAsc" | "naturalDesc" @cuetsy(kind="enum")
+VariableSort: "disabled" | "alphabeticalAsc" | "alphabeticalDesc" | "numericalAsc" | "numericalDesc" | "alphabeticalCaseInsensitiveAsc" | "alphabeticalCaseInsensitiveDesc" | "naturalAsc" | "naturalDesc"
 
 // Options to config when to refresh a variable
 // `never`: Never refresh the variable
 // `onDashboardLoad`: Queries the data source every time the dashboard loads.
 // `onTimeRangeChanged`: Queries the data source when the dashboard time range changes.
-#VariableRefresh: *"never" | "onDashboardLoad" | "onTimeRangeChanged" @cuetsy(kind="enum")
+VariableRefresh: *"never" | "onDashboardLoad" | "onTimeRangeChanged"
 
 // Determine if the variable shows on dashboard
 // Accepted values are `dontHide` (show label and value), `hideLabel` (show value only), `hideVariable` (show nothing).
-#VariableHide: *"dontHide" | "hideLabel" | "hideVariable" @cuetsy(kind="enum")
+VariableHide: *"dontHide" | "hideLabel" | "hideVariable"
 
 // FIXME: should we introduce this? --- Variable value option
-#VariableValueOption: {
+VariableValueOption: {
 	label:  string
-	value:  #VariableValueSingle
+	value:  VariableValueSingle
 	group?: string
 }
 
 // Variable option specification
-#VariableOption: {
+VariableOption: {
 	// Whether the option is selected or not
 	selected?: bool
 	// Text to be displayed for the option
@@ -587,23 +634,23 @@ v2: {
 }
 
 // Query variable specification
-#QueryVariableSpec: {
+QueryVariableSpec: {
 	name: string | *""
-	current: #VariableOption | *{
+	current: VariableOption | *{
 		text:  ""
 		value: ""
 	}
 	label?:       string
-	hide:         #VariableHide
-	refresh:      #VariableRefresh
+	hide:         VariableHide
+	refresh:      VariableRefresh
 	skipUrlSync:  bool | *false
 	description?: string
-	datasource?:  #DataSourceRef
-	query:        string | #DataQueryKind | *""
+	datasource?:  DataSourceRef
+	query:        string | DataQueryKind | *""
 	regex:        string | *""
-	sort:         #VariableSort
+	sort:         VariableSort
 	definition?:  string
-	options: [...#VariableOption] | *[]
+	options: [...VariableOption] | *[]
 	multi:        bool | *false
 	includeAll:   bool | *false
 	allValue?:    string
@@ -611,163 +658,160 @@ v2: {
 }
 
 // Query variable kind
-#QueryVariableKind: {
+QueryVariableKind: {
 	kind: "QueryVariable"
-	spec: #QueryVariableSpec
+	spec: QueryVariableSpec
 }
 
 // Text variable specification
-#TextVariableSpec: {
+TextVariableSpec: {
 	name: string | *""
-	current: #VariableOption | *{
+	current: VariableOption | *{
 		text:  ""
 		value: ""
 	}
 	query:        string | *""
 	label?:       string
-	hide:         #VariableHide
+	hide:         VariableHide
 	skipUrlSync:  bool | *false
 	description?: string
 }
 
 // Text variable kind
-#TextVariableKind: {
+TextVariableKind: {
 	kind: "TextVariable"
-	spec: #TextVariableSpec
+	spec: TextVariableSpec
 }
 
 // Constant variable specification
-#ConstantVariableSpec: {
+ConstantVariableSpec: {
 	name:  string | *""
 	query: string | *""
-	current: #VariableOption | *{
+	current: VariableOption | *{
 		text:  ""
 		value: ""
 	}
 	label?:       string
-	hide:         #VariableHide
+	hide:         VariableHide
 	skipUrlSync:  bool | *false
 	description?: string
 }
 
 // Constant variable kind
-#ConstantVariableKind: {
+ConstantVariableKind: {
 	kind: "ConstantVariable"
-	spec: #ConstantVariableSpec
+	spec: ConstantVariableSpec
 }
 
 // Datasource variable specification
-#DatasourceVariableSpec: {
+DatasourceVariableSpec: {
 	name:     string | *""
 	pluginId: string | *""
-	refresh:  #VariableRefresh
+	refresh:  VariableRefresh
 	regex:    string | *""
-	current: #VariableOption | *{
+	current: VariableOption | *{
 		text:  ""
 		value: ""
 	}
-	defaultOptionEnabled: bool | *false
-	options: [...#VariableOption] | *[]
+	options: [...VariableOption] | *[]
 	multi:        bool | *false
 	includeAll:   bool | *false
 	allValue?:    string
 	label?:       string
-	hide:         #VariableHide
+	hide:         VariableHide
 	skipUrlSync:  bool | *false
 	description?: string
 }
 
 // Datasource variable kind
-#DatasourceVariableKind: {
+DatasourceVariableKind: {
 	kind: "DatasourceVariable"
-	spec: #DatasourceVariableSpec
+	spec: DatasourceVariableSpec
 }
 
 // Interval variable specification
-#IntervalVariableSpec: {
+IntervalVariableSpec: {
 	name:  string | *""
 	query: string | *""
-	current: #VariableOption | *{
+	current: VariableOption | *{
 		text:  ""
 		value: ""
 	}
-	options: [...#VariableOption] | *[]
+	options: [...VariableOption] | *[]
 	auto:         bool | *false
 	auto_min:     string | *""
 	auto_count:   int | *0
-	refresh:      #VariableRefresh
+	refresh:      VariableRefresh
 	label?:       string
-	hide:         #VariableHide
+	hide:         VariableHide
 	skipUrlSync:  bool | *false
 	description?: string
 }
 
 // Interval variable kind
-#IntervalVariableKind: {
+IntervalVariableKind: {
 	kind: "IntervalVariable"
-	spec: #IntervalVariableSpec
+	spec: IntervalVariableSpec
 }
 
 // Custom variable specification
-#CustomVariableSpec: {
+CustomVariableSpec: {
 	name:    string | *""
 	query:   string | *""
-	current: #VariableOption
-	options: [...#VariableOption] | *[]
+	current: VariableOption
+	options: [...VariableOption] | *[]
 	multi:        bool | *false
 	includeAll:   bool | *false
 	allValue?:    string
 	label?:       string
-	hide:         #VariableHide
+	hide:         VariableHide
 	skipUrlSync:  bool | *false
 	description?: string
 }
 
 // Custom variable kind
-#CustomVariableKind: {
+CustomVariableKind: {
 	kind: "CustomVariable"
-	spec: #CustomVariableSpec
+	spec: CustomVariableSpec
 }
 
 // GroupBy variable specification
-#GroupByVariableSpec: {
+GroupByVariableSpec: {
 	name:        string | *""
-	datasource?: #DataSourceRef
-	current: #VariableOption | *{
+	datasource?: DataSourceRef
+	current: VariableOption | *{
 		text:  ""
 		value: ""
 	}
-	options: [...#VariableOption] | *[]
+	options: [...VariableOption] | *[]
 	multi:        bool | *false
-	includeAll:   bool | *false
-	allValue?:    string
 	label?:       string
-	hide:         #VariableHide
+	hide:         VariableHide
 	skipUrlSync:  bool | *false
 	description?: string
 }
 
 // Group variable kind
-#GroupByVariableKind: {
+GroupByVariableKind: {
 	kind: "GroupByVariable"
-	spec: #GroupByVariableSpec
+	spec: GroupByVariableSpec
 }
 
 // Adhoc variable specification
-#AdhocVariableSpec: {
+AdhocVariableSpec: {
 	name:        string | *""
-	datasource?: #DataSourceRef
-	baseFilters: [...#AdHocFilterWithLabels] | *[]
-	filters: [...#AdHocFilterWithLabels] | *[]
-	defaultKeys: [...#MetricFindValue] | *[]
+	datasource?: DataSourceRef
+	baseFilters: [...AdHocFilterWithLabels] | *[]
+	filters: [...AdHocFilterWithLabels] | *[]
+	defaultKeys: [...MetricFindValue] | *[]
 	label?:       string
-	hide:         #VariableHide
+	hide:         VariableHide
 	skipUrlSync:  bool | *false
 	description?: string
 }
 
 // Define the MetricFindValue type
-#MetricFindValue: {
+MetricFindValue: {
 	text:        string
 	value?:      string | number
 	group?:      string
@@ -775,7 +819,7 @@ v2: {
 }
 
 // Define the AdHocFilterWithLabels type
-#AdHocFilterWithLabels: {
+AdHocFilterWithLabels: {
 	key:      string
 	operator: string
 	value:    string
@@ -788,7 +832,7 @@ v2: {
 }
 
 // Adhoc variable kind
-#AdhocVariableKind: {
+AdhocVariableKind: {
 	kind: "AdhocVariable"
-	spec: #AdhocVariableSpec
+	spec: AdhocVariableSpec
 }

@@ -1,5 +1,9 @@
 package dashboard
 
+import (
+	"github.com/grafana/grafana/sdkkinds/dashboard/v2alpha1"
+)
+
 manifest: {
 	appName:       "dashboard"
 	groupOverride: "dashboard.grafana.app"
@@ -14,14 +18,29 @@ manifest: {
 				backend:  true
 			}
 
-			// TODO: enable v2, currently crashing with an error
-			// panic: runtime error: index out of range [0] with length 0
-			// goroutine 1 [running]:
-			// github.com/grafana/cog/internal/ast/compiler.(*DisjunctionInferMapping).inferDiscriminatorField
-			// github.com/grafana/cog@v0.0.18/internal/ast/compiler/disjunctions_infer_mapping.go:114 +0x4d0
-			// versions: v0 & v1 & v2
+			versions: {
+				"v0alpha1": {
+					schema: {
+						// For now, we use unstructured for the spec,
+						// and it cannot be produced by the SDK codegen.
+						spec: {}
+					}
+				}
 
-			versions: v0 & v1
+				"v1alpha1": {
+					schema: {
+						// For now, we use unstructured for the spec,
+						// and it cannot be produced by the SDK codegen.
+						spec: {}
+					}
+				}
+
+				"v2alpha1": {
+					schema: {
+						spec: v2alpha1.DashboardSpec
+					}
+				}
+			}
 		},
 	]
 }

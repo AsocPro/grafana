@@ -55,7 +55,6 @@ func TestConvertDashboardVersions(t *testing.T) {
 	err = Convert_v0alpha1_Unstructured_To_v2alpha1_DashboardSpec(&object, &result, nil)
 	require.NoError(t, err)
 	require.Equal(t, result.Title, "New dashboard")
-	require.Equal(t, result.Unstructured, object)
 
 	// now convert back & ensure it is the same
 	object2 := common.Unstructured{}
