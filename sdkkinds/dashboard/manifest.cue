@@ -1,6 +1,8 @@
 package dashboard
 
 import (
+	"github.com/grafana/grafana/sdkkinds/dashboard/v0alpha1"
+	"github.com/grafana/grafana/sdkkinds/dashboard/v1alpha1"
 	"github.com/grafana/grafana/sdkkinds/dashboard/v2alpha1"
 )
 
@@ -21,17 +23,13 @@ manifest: {
 			versions: {
 				"v0alpha1": {
 					schema: {
-						// For now, we use unstructured for the spec,
-						// and it cannot be produced by the SDK codegen.
-						spec: {}
+						spec: v0alpha1.DashboardSpec
 					}
 				}
 
 				"v1alpha1": {
 					schema: {
-						// For now, we use unstructured for the spec,
-						// and it cannot be produced by the SDK codegen.
-						spec: {}
+						spec: v1alpha1.DashboardSpec
 					}
 				}
 
