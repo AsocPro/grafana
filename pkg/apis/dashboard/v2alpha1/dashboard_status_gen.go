@@ -8,7 +8,7 @@ type DashboardstatusOperatorState struct {
 	LastEvaluation string `json:"lastEvaluation"`
 	// state describes the state of the lastEvaluation.
 	// It is limited to three possible states for machine evaluation.
-	State DashboardstatusOperatorStateState `json:"state"`
+	State DashboardStatusOperatorStateState `json:"state"`
 	// descriptiveState is an optional more descriptive state field which has no requirements on format
 	DescriptiveState *string `json:"descriptiveState,omitempty"`
 	// details contains any extra information that is operator-specific
@@ -34,10 +34,11 @@ func NewDashboardStatus() *DashboardStatus {
 	return &DashboardStatus{}
 }
 
-type DashboardstatusOperatorStateState string
+// +k8s:openapi-gen=true
+type DashboardStatusOperatorStateState string
 
 const (
-	DashboardstatusOperatorStateStateDashboardSuccess    DashboardstatusOperatorStateState = "success"
-	DashboardstatusOperatorStateStateDashboardInProgress DashboardstatusOperatorStateState = "in_progress"
-	DashboardstatusOperatorStateStateDashboardFailed     DashboardstatusOperatorStateState = "failed"
+	DashboardStatusOperatorStateStateSuccess    DashboardStatusOperatorStateState = "success"
+	DashboardStatusOperatorStateStateInProgress DashboardStatusOperatorStateState = "in_progress"
+	DashboardStatusOperatorStateStateFailed     DashboardStatusOperatorStateState = "failed"
 )

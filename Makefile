@@ -471,7 +471,7 @@ enable-go-race:
 # We should remove this once we have a proper way to generate the kinds.
 .PHONY: gen-dashboard-kinds
 gen-dashboard-kinds:
-	@grafana-app-sdk generate --source=sdkkinds/dashboard --gogenpath=pkg/apis --tsgenpath=packages/grafana-schema/src/schema --grouping=group --defencoding=none
+	@grafana-app-sdk generate --source=sdkkinds/dashboard --gogenpath=pkg/apis --tsgenpath=packages/grafana-schema/src/schema --grouping=group --defencoding=none --noschemasinmanifest
 
 check-tparse:
 	@command -v tparse >/dev/null 2>&1 || { \

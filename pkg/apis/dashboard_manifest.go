@@ -11,10 +11,31 @@ import (
 	"github.com/grafana/grafana-app-sdk/app"
 )
 
+var ()
+
 var appManifestData = app.ManifestData{
 	AppName: "dashboard",
 	Group:   "dashboard.grafana.app",
-	Kinds:   []app.ManifestKind{},
+	Kinds: []app.ManifestKind{
+		{
+			Kind:       "Dashboard",
+			Scope:      "Namespaced",
+			Conversion: false,
+			Versions: []app.ManifestKindVersion{
+				{
+					Name: "v0alpha1",
+				},
+
+				{
+					Name: "v1alpha1",
+				},
+
+				{
+					Name: "v2alpha1",
+				},
+			},
+		},
+	},
 }
 
 func jsonToMap(j string) map[string]any {
