@@ -91,9 +91,11 @@ func (s *uidValidationStep) Run(ctx context.Context, obj *advisor.CheckSpec) ([]
 		err := util.ValidateUID(ds.UID)
 		if err != nil {
 			dsErrs = append(dsErrs, advisor.CheckReportError{
-				Severity: advisor.CheckReportErrorSeverityLow,
-				Reason:   fmt.Sprintf("Invalid UID '%s' for data source %s", ds.UID, ds.Name),
-				Action:   "Check the <a href='https://grafana.com/docs/grafana/latest/upgrade-guide/upgrade-v11.2/#grafana-data-source-uid-format-enforcement' target=_blank>documentation</a> for more information.",
+				Severity:  advisor.CheckReportErrorSeverityLow,
+				Reason:    fmt.Sprintf("Invalid UID '%s' for data source %s", ds.UID, ds.Name),
+				Action:    "Check the <a href='https://grafana.com/docs/grafana/latest/upgrade-guide/upgrade-v11.2/#grafana-data-source-uid-format-enforcement' target=_blank>documentation</a> for more information.",
+				StepID:    s.ID(),
+				ElementID: ds.UID,
 			})
 		}
 	}
@@ -148,6 +150,8 @@ func (s *healthCheckStep) Run(ctx context.Context, obj *advisor.CheckSpec) ([]ad
 				Action: fmt.Sprintf(
 					"Go to the <a href='/connections/datasources/edit/%s'>data source configuration</a>"+
 						" and address the issues reported.", ds.UID),
+				StepID:    s.ID(),
+				ElementID: ds.UID,
 			})
 		}
 	}
