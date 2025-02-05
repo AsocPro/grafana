@@ -14,11 +14,13 @@ import { useStyles2 } from '@grafana/ui';
 import { t } from 'app/core/internationalization';
 
 import { isClonedKey } from '../../utils/clone';
+import { getDashboardSceneFor } from '../../utils/utils';
 import { DashboardScene } from '../DashboardScene';
 import { DashboardGridItem } from '../layout-default/DashboardGridItem';
 import { DefaultGridLayoutManager } from '../layout-default/DefaultGridLayoutManager';
 import { RowRepeaterBehavior } from '../layout-default/RowRepeaterBehavior';
 import { ResponsiveGridLayoutManager } from '../layout-responsive-grid/ResponsiveGridLayoutManager';
+import { TabsLayoutManager } from '../layout-tabs/TabsLayoutManager';
 import { DashboardLayoutManager } from '../types/DashboardLayoutManager';
 
 import { RowItem } from './RowItem';
@@ -73,6 +75,12 @@ export class RowsLayoutManager extends SceneObjectBase<RowsLayoutManagerState> i
         }),
       ],
     });
+  }
+
+  public addNewTab() {
+    const tabsLayout = TabsLayoutManager.createFromLayout(this);
+    tabsLayout.addNewTab();
+    getDashboardSceneFor(this).switchLayout(tabsLayout);
   }
 
   public getMaxPanelId(): number {

@@ -49,6 +49,11 @@ export interface DashboardLayoutManager<S = {}> extends SceneObject {
   addNewRow(): void;
 
   /**
+   * Add tab
+   */
+  addNewTab(): void;
+
+  /**
    * Notify the layout manager that the edit mode has changed
    * @param isEditing
    */
