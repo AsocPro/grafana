@@ -1,10 +1,11 @@
-import { VizPanel, sceneGraph, behaviors } from '@grafana/scenes';
+import { VizPanel, sceneGraph, behaviors, SceneObject } from '@grafana/scenes';
 
 import { DashboardDataLayerSet } from '../scene/DashboardDataLayerSet';
 import { DashboardScene } from '../scene/DashboardScene';
 import { VizPanelLinks } from '../scene/PanelLinks';
 
-import { getLayoutManagerFor } from './utils';
+import { isClonedKey } from './clone';
+import { getDashboardSceneFor, getLayoutManagerFor, getPanelIdForVizPanel } from './utils';
 
 function getTimePicker(scene: DashboardScene) {
   return scene.state.controls?.state.timePicker;
@@ -38,6 +39,14 @@ function getDataLayers(scene: DashboardScene): DashboardDataLayerSet {
   return data;
 }
 
+function getAllSelectedObjects(scene: SceneObject): SceneObject[] {
+  return (
+    getDashboardSceneFor(scene)
+      .state.editPane.state.selection?.getSelectionEntries()
+      .map(([, ref]) => ref.resolve()) ?? []
+  );
+}
+
 export function getCursorSync(scene: DashboardScene) {
   const cursorSync = scene.state.$behaviors?.find((b) => b instanceof behaviors.CursorSync);
 
@@ -48,12 +57,37 @@ export function getCursorSync(scene: DashboardScene) {
   return;
 }
 
+/**
+ * Will look for all panels in the entire scene starting from root
+ * and find the next free panel id
+ */
+export function getNextPanelId(scene: SceneObject): number {
+  let max = 1;
+
+  sceneGraph
+    .findAllObjects(scene.getRoot(), (obj) => obj instanceof VizPanel)
+    .forEach((panel) => {
+      if (isClonedKey(panel.state.key!)) {
+        return;
+      }
+
+      const panelId = getPanelIdForVizPanel(panel);
+      if (panelId > max) {
+        max = panelId;
+      }
+    });
+
+  return max + 1;
+}
+
 export const dashboardSceneGraph = {
   getTimePicker,
   getRefreshPicker,
   getPanelLinks,
   getVizPanels,
   getDataLayers,
+  getAllSelectedObjects,
   getCursorSync,
   getLayoutManagerFor,
+  getNextPanelId,
 };

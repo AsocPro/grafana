@@ -25,23 +25,18 @@ export interface DashboardLayoutManager<S = {}> extends SceneObject {
    * Remove an element / panel
    * @param panel
    */
-  removePanel(panel: VizPanel): void;
+  removePanel?(panel: VizPanel): void;
 
   /**
    * Creates a copy of an existing element and adds it to the layout
    * @param panel
    */
-  duplicatePanel(panel: VizPanel): void;
+  duplicatePanel?(panel: VizPanel): void;
 
   /**
    * getVizPanels
    */
   getVizPanels(): VizPanel[];
-
-  /**
-   * Returns the highest panel id in the layout
-   */
-  getMaxPanelId(): number;
 
   /**
    * Add row
