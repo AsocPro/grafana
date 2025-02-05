@@ -3,7 +3,6 @@
 package v2alpha1
 
 import (
-	common "/common"
 	json "encoding/json"
 	errors "errors"
 	fmt "fmt"
@@ -13,22 +12,22 @@ import (
 // "Crosshair" for shared crosshair.
 // "Tooltip" for shared crosshair AND shared tooltip.
 // +k8s:openapi-gen=true
-type DashboardspecDashboardCursorSync string
+type DashboardDashboardCursorSync string
 
 const (
-	DashboardSpecDashboardCursorSyncOff       DashboardspecDashboardCursorSync = "Off"
-	DashboardSpecDashboardCursorSyncCrosshair DashboardspecDashboardCursorSync = "Crosshair"
-	DashboardSpecDashboardCursorSyncTooltip   DashboardspecDashboardCursorSync = "Tooltip"
+	DashboardDashboardCursorSyncOff       DashboardDashboardCursorSync = "Off"
+	DashboardDashboardCursorSyncCrosshair DashboardDashboardCursorSync = "Crosshair"
+	DashboardDashboardCursorSyncTooltip   DashboardDashboardCursorSync = "Tooltip"
 )
 
 // Links with references to other dashboards or external resources
 // +k8s:openapi-gen=true
-type DashboardspecDashboardLink struct {
+type DashboardDashboardLink struct {
 	// Title to display with the link
 	Title string `json:"title"`
 	// Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
 	// FIXME: The type is generated as `type: DashboardLinkType | dashboardLinkType.Link;` but it should be `type: DashboardLinkType`
-	Type DashboardspecDashboardLinkType `json:"type"`
+	Type DashboardDashboardLinkType `json:"type"`
 	// Icon name to be displayed with the link
 	Icon string `json:"icon"`
 	// Tooltip to display when the user hovers their mouse over it
@@ -47,9 +46,9 @@ type DashboardspecDashboardLink struct {
 	KeepTime bool `json:"keepTime"`
 }
 
-// NewDashboardspecDashboardLink creates a new DashboardspecDashboardLink object.
-func NewDashboardspecDashboardLink() *DashboardspecDashboardLink {
-	return &DashboardspecDashboardLink{
+// NewDashboardDashboardLink creates a new DashboardDashboardLink object.
+func NewDashboardDashboardLink() *DashboardDashboardLink {
+	return &DashboardDashboardLink{
 		AsDropdown:  false,
 		TargetBlank: false,
 		IncludeVars: false,
@@ -59,17 +58,17 @@ func NewDashboardspecDashboardLink() *DashboardspecDashboardLink {
 
 // Dashboard Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
 // +k8s:openapi-gen=true
-type DashboardspecDashboardLinkType string
+type DashboardDashboardLinkType string
 
 const (
-	DashboardSpecDashboardLinkTypeLink       DashboardspecDashboardLinkType = "link"
-	DashboardSpecDashboardLinkTypeDashboards DashboardspecDashboardLinkType = "dashboards"
+	DashboardDashboardLinkTypeLink       DashboardDashboardLinkType = "link"
+	DashboardDashboardLinkTypeDashboards DashboardDashboardLinkType = "dashboards"
 )
 
 // Time configuration
 // It defines the default time config for the time picker, the refresh picker for the specific dashboard.
 // +k8s:openapi-gen=true
-type DashboardspecTimeSettingsSpec struct {
+type DashboardTimeSettingsSpec struct {
 	// Timezone of dashboard. Accepted values are IANA TZDB zone ID or "browser" or "utc".
 	Timezone *string `json:"timezone,omitempty"`
 	// Start time range for dashboard.
@@ -99,9 +98,9 @@ type DashboardspecTimeSettingsSpec struct {
 	NowDelay *string `json:"nowDelay,omitempty"`
 }
 
-// NewDashboardspecTimeSettingsSpec creates a new DashboardspecTimeSettingsSpec object.
-func NewDashboardspecTimeSettingsSpec() *DashboardspecTimeSettingsSpec {
-	return &DashboardspecTimeSettingsSpec{
+// NewDashboardTimeSettingsSpec creates a new DashboardTimeSettingsSpec object.
+func NewDashboardTimeSettingsSpec() *DashboardTimeSettingsSpec {
+	return &DashboardTimeSettingsSpec{
 		Timezone:             (func(input string) *string { return &input })("browser"),
 		From:                 "now-6h",
 		To:                   "now",
@@ -111,55 +110,55 @@ func NewDashboardspecTimeSettingsSpec() *DashboardspecTimeSettingsSpec {
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecVariableKind = DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind
+type DashboardVariableKind = DashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind
 
-// NewDashboardspecVariableKind creates a new DashboardspecVariableKind object.
-func NewDashboardspecVariableKind() *DashboardspecVariableKind {
-	return NewDashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind()
+// NewDashboardVariableKind creates a new DashboardVariableKind object.
+func NewDashboardVariableKind() *DashboardVariableKind {
+	return NewDashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind()
 }
 
 // Query variable kind
 // +k8s:openapi-gen=true
-type DashboardspecQueryVariableKind struct {
-	Kind string                         `json:"kind"`
-	Spec DashboardspecQueryVariableSpec `json:"spec"`
+type DashboardQueryVariableKind struct {
+	Kind string                     `json:"kind"`
+	Spec DashboardQueryVariableSpec `json:"spec"`
 }
 
-// NewDashboardspecQueryVariableKind creates a new DashboardspecQueryVariableKind object.
-func NewDashboardspecQueryVariableKind() *DashboardspecQueryVariableKind {
-	return &DashboardspecQueryVariableKind{
+// NewDashboardQueryVariableKind creates a new DashboardQueryVariableKind object.
+func NewDashboardQueryVariableKind() *DashboardQueryVariableKind {
+	return &DashboardQueryVariableKind{
 		Kind: "QueryVariable",
-		Spec: *NewDashboardspecQueryVariableSpec(),
+		Spec: *NewDashboardQueryVariableSpec(),
 	}
 }
 
 // Query variable specification
 // +k8s:openapi-gen=true
-type DashboardspecQueryVariableSpec struct {
-	Name        string                             `json:"name"`
-	Current     DashboardspecVariableOption        `json:"current"`
-	Label       *string                            `json:"label,omitempty"`
-	Hide        DashboardspecVariableHide          `json:"hide"`
-	Refresh     DashboardspecVariableRefresh       `json:"refresh"`
-	SkipUrlSync bool                               `json:"skipUrlSync"`
-	Description *string                            `json:"description,omitempty"`
-	Datasource  *DashboardspecDataSourceRef        `json:"datasource,omitempty"`
-	Query       DashboardStringOrSpecDataQueryKind `json:"query"`
-	Regex       string                             `json:"regex"`
-	Sort        DashboardspecVariableSort          `json:"sort"`
-	Definition  *string                            `json:"definition,omitempty"`
-	Options     []DashboardspecVariableOption      `json:"options"`
-	Multi       bool                               `json:"multi"`
-	IncludeAll  bool                               `json:"includeAll"`
-	AllValue    *string                            `json:"allValue,omitempty"`
-	Placeholder *string                            `json:"placeholder,omitempty"`
+type DashboardQueryVariableSpec struct {
+	Name        string                         `json:"name"`
+	Current     DashboardVariableOption        `json:"current"`
+	Label       *string                        `json:"label,omitempty"`
+	Hide        DashboardVariableHide          `json:"hide"`
+	Refresh     DashboardVariableRefresh       `json:"refresh"`
+	SkipUrlSync bool                           `json:"skipUrlSync"`
+	Description *string                        `json:"description,omitempty"`
+	Datasource  *DashboardDataSourceRef        `json:"datasource,omitempty"`
+	Query       DashboardStringOrDataQueryKind `json:"query"`
+	Regex       string                         `json:"regex"`
+	Sort        DashboardVariableSort          `json:"sort"`
+	Definition  *string                        `json:"definition,omitempty"`
+	Options     []DashboardVariableOption      `json:"options"`
+	Multi       bool                           `json:"multi"`
+	IncludeAll  bool                           `json:"includeAll"`
+	AllValue    *string                        `json:"allValue,omitempty"`
+	Placeholder *string                        `json:"placeholder,omitempty"`
 }
 
-// NewDashboardspecQueryVariableSpec creates a new DashboardspecQueryVariableSpec object.
-func NewDashboardspecQueryVariableSpec() *DashboardspecQueryVariableSpec {
-	return &DashboardspecQueryVariableSpec{
+// NewDashboardQueryVariableSpec creates a new DashboardQueryVariableSpec object.
+func NewDashboardQueryVariableSpec() *DashboardQueryVariableSpec {
+	return &DashboardQueryVariableSpec{
 		Name: "",
-		Current: DashboardspecVariableOption{
+		Current: DashboardVariableOption{
 			Text: DashboardStringOrArrayOfString{
 				String: (func(input string) *string { return &input })(""),
 			},
@@ -167,10 +166,10 @@ func NewDashboardspecQueryVariableSpec() *DashboardspecQueryVariableSpec {
 				String: (func(input string) *string { return &input })(""),
 			},
 		},
-		Hide:        DashboardSpecVariableHideDontHide,
-		Refresh:     DashboardSpecVariableRefreshNever,
+		Hide:        DashboardVariableHideDontHide,
+		Refresh:     DashboardVariableRefreshNever,
 		SkipUrlSync: false,
-		Query:       *NewDashboardStringOrSpecDataQueryKind(),
+		Query:       *NewDashboardStringOrDataQueryKind(),
 		Regex:       "",
 		Multi:       false,
 		IncludeAll:  false,
@@ -179,7 +178,7 @@ func NewDashboardspecQueryVariableSpec() *DashboardspecQueryVariableSpec {
 
 // Variable option specification
 // +k8s:openapi-gen=true
-type DashboardspecVariableOption struct {
+type DashboardVariableOption struct {
 	// Whether the option is selected or not
 	Selected *bool `json:"selected,omitempty"`
 	// Text to be displayed for the option
@@ -188,9 +187,9 @@ type DashboardspecVariableOption struct {
 	Value DashboardStringOrArrayOfString `json:"value"`
 }
 
-// NewDashboardspecVariableOption creates a new DashboardspecVariableOption object.
-func NewDashboardspecVariableOption() *DashboardspecVariableOption {
-	return &DashboardspecVariableOption{
+// NewDashboardVariableOption creates a new DashboardVariableOption object.
+func NewDashboardVariableOption() *DashboardVariableOption {
+	return &DashboardVariableOption{
 		Text:  *NewDashboardStringOrArrayOfString(),
 		Value: *NewDashboardStringOrArrayOfString(),
 	}
@@ -199,12 +198,12 @@ func NewDashboardspecVariableOption() *DashboardspecVariableOption {
 // Determine if the variable shows on dashboard
 // Accepted values are `dontHide` (show label and value), `hideLabel` (show value only), `hideVariable` (show nothing).
 // +k8s:openapi-gen=true
-type DashboardspecVariableHide string
+type DashboardVariableHide string
 
 const (
-	DashboardSpecVariableHideDontHide     DashboardspecVariableHide = "dontHide"
-	DashboardSpecVariableHideHideLabel    DashboardspecVariableHide = "hideLabel"
-	DashboardSpecVariableHideHideVariable DashboardspecVariableHide = "hideVariable"
+	DashboardVariableHideDontHide     DashboardVariableHide = "dontHide"
+	DashboardVariableHideHideLabel    DashboardVariableHide = "hideLabel"
+	DashboardVariableHideHideVariable DashboardVariableHide = "hideVariable"
 )
 
 // Options to config when to refresh a variable
@@ -212,37 +211,37 @@ const (
 // `onDashboardLoad`: Queries the data source every time the dashboard loads.
 // `onTimeRangeChanged`: Queries the data source when the dashboard time range changes.
 // +k8s:openapi-gen=true
-type DashboardspecVariableRefresh string
+type DashboardVariableRefresh string
 
 const (
-	DashboardSpecVariableRefreshNever              DashboardspecVariableRefresh = "never"
-	DashboardSpecVariableRefreshOnDashboardLoad    DashboardspecVariableRefresh = "onDashboardLoad"
-	DashboardSpecVariableRefreshOnTimeRangeChanged DashboardspecVariableRefresh = "onTimeRangeChanged"
+	DashboardVariableRefreshNever              DashboardVariableRefresh = "never"
+	DashboardVariableRefreshOnDashboardLoad    DashboardVariableRefresh = "onDashboardLoad"
+	DashboardVariableRefreshOnTimeRangeChanged DashboardVariableRefresh = "onTimeRangeChanged"
 )
 
 // +k8s:openapi-gen=true
-type DashboardspecDataSourceRef struct {
+type DashboardDataSourceRef struct {
 	// The plugin type-id
 	Type *string `json:"type,omitempty"`
 	// Specific datasource instance
 	Uid *string `json:"uid,omitempty"`
 }
 
-// NewDashboardspecDataSourceRef creates a new DashboardspecDataSourceRef object.
-func NewDashboardspecDataSourceRef() *DashboardspecDataSourceRef {
-	return &DashboardspecDataSourceRef{}
+// NewDashboardDataSourceRef creates a new DashboardDataSourceRef object.
+func NewDashboardDataSourceRef() *DashboardDataSourceRef {
+	return &DashboardDataSourceRef{}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecDataQueryKind struct {
+type DashboardDataQueryKind struct {
 	// The kind of a DataQueryKind is the datasource type
 	Kind string                 `json:"kind"`
 	Spec map[string]interface{} `json:"spec"`
 }
 
-// NewDashboardspecDataQueryKind creates a new DashboardspecDataQueryKind object.
-func NewDashboardspecDataQueryKind() *DashboardspecDataQueryKind {
-	return &DashboardspecDataQueryKind{}
+// NewDashboardDataQueryKind creates a new DashboardDataQueryKind object.
+func NewDashboardDataQueryKind() *DashboardDataQueryKind {
+	return &DashboardDataQueryKind{}
 }
 
 // Sort variable options
@@ -258,52 +257,52 @@ func NewDashboardspecDataQueryKind() *DashboardspecDataQueryKind {
 // `naturalDesc`: Natural DESC
 // VariableSort enum with default value
 // +k8s:openapi-gen=true
-type DashboardspecVariableSort string
+type DashboardVariableSort string
 
 const (
-	DashboardSpecVariableSortDisabled                        DashboardspecVariableSort = "disabled"
-	DashboardSpecVariableSortAlphabeticalAsc                 DashboardspecVariableSort = "alphabeticalAsc"
-	DashboardSpecVariableSortAlphabeticalDesc                DashboardspecVariableSort = "alphabeticalDesc"
-	DashboardSpecVariableSortNumericalAsc                    DashboardspecVariableSort = "numericalAsc"
-	DashboardSpecVariableSortNumericalDesc                   DashboardspecVariableSort = "numericalDesc"
-	DashboardSpecVariableSortAlphabeticalCaseInsensitiveAsc  DashboardspecVariableSort = "alphabeticalCaseInsensitiveAsc"
-	DashboardSpecVariableSortAlphabeticalCaseInsensitiveDesc DashboardspecVariableSort = "alphabeticalCaseInsensitiveDesc"
-	DashboardSpecVariableSortNaturalAsc                      DashboardspecVariableSort = "naturalAsc"
-	DashboardSpecVariableSortNaturalDesc                     DashboardspecVariableSort = "naturalDesc"
+	DashboardVariableSortDisabled                        DashboardVariableSort = "disabled"
+	DashboardVariableSortAlphabeticalAsc                 DashboardVariableSort = "alphabeticalAsc"
+	DashboardVariableSortAlphabeticalDesc                DashboardVariableSort = "alphabeticalDesc"
+	DashboardVariableSortNumericalAsc                    DashboardVariableSort = "numericalAsc"
+	DashboardVariableSortNumericalDesc                   DashboardVariableSort = "numericalDesc"
+	DashboardVariableSortAlphabeticalCaseInsensitiveAsc  DashboardVariableSort = "alphabeticalCaseInsensitiveAsc"
+	DashboardVariableSortAlphabeticalCaseInsensitiveDesc DashboardVariableSort = "alphabeticalCaseInsensitiveDesc"
+	DashboardVariableSortNaturalAsc                      DashboardVariableSort = "naturalAsc"
+	DashboardVariableSortNaturalDesc                     DashboardVariableSort = "naturalDesc"
 )
 
 // Text variable kind
 // +k8s:openapi-gen=true
-type DashboardspecTextVariableKind struct {
-	Kind string                        `json:"kind"`
-	Spec DashboardspecTextVariableSpec `json:"spec"`
+type DashboardTextVariableKind struct {
+	Kind string                    `json:"kind"`
+	Spec DashboardTextVariableSpec `json:"spec"`
 }
 
-// NewDashboardspecTextVariableKind creates a new DashboardspecTextVariableKind object.
-func NewDashboardspecTextVariableKind() *DashboardspecTextVariableKind {
-	return &DashboardspecTextVariableKind{
+// NewDashboardTextVariableKind creates a new DashboardTextVariableKind object.
+func NewDashboardTextVariableKind() *DashboardTextVariableKind {
+	return &DashboardTextVariableKind{
 		Kind: "TextVariable",
-		Spec: *NewDashboardspecTextVariableSpec(),
+		Spec: *NewDashboardTextVariableSpec(),
 	}
 }
 
 // Text variable specification
 // +k8s:openapi-gen=true
-type DashboardspecTextVariableSpec struct {
-	Name        string                      `json:"name"`
-	Current     DashboardspecVariableOption `json:"current"`
-	Query       string                      `json:"query"`
-	Label       *string                     `json:"label,omitempty"`
-	Hide        DashboardspecVariableHide   `json:"hide"`
-	SkipUrlSync bool                        `json:"skipUrlSync"`
-	Description *string                     `json:"description,omitempty"`
+type DashboardTextVariableSpec struct {
+	Name        string                  `json:"name"`
+	Current     DashboardVariableOption `json:"current"`
+	Query       string                  `json:"query"`
+	Label       *string                 `json:"label,omitempty"`
+	Hide        DashboardVariableHide   `json:"hide"`
+	SkipUrlSync bool                    `json:"skipUrlSync"`
+	Description *string                 `json:"description,omitempty"`
 }
 
-// NewDashboardspecTextVariableSpec creates a new DashboardspecTextVariableSpec object.
-func NewDashboardspecTextVariableSpec() *DashboardspecTextVariableSpec {
-	return &DashboardspecTextVariableSpec{
+// NewDashboardTextVariableSpec creates a new DashboardTextVariableSpec object.
+func NewDashboardTextVariableSpec() *DashboardTextVariableSpec {
+	return &DashboardTextVariableSpec{
 		Name: "",
-		Current: DashboardspecVariableOption{
+		Current: DashboardVariableOption{
 			Text: DashboardStringOrArrayOfString{
 				String: (func(input string) *string { return &input })(""),
 			},
@@ -312,44 +311,44 @@ func NewDashboardspecTextVariableSpec() *DashboardspecTextVariableSpec {
 			},
 		},
 		Query:       "",
-		Hide:        DashboardSpecVariableHideDontHide,
+		Hide:        DashboardVariableHideDontHide,
 		SkipUrlSync: false,
 	}
 }
 
 // Constant variable kind
 // +k8s:openapi-gen=true
-type DashboardspecConstantVariableKind struct {
-	Kind string                            `json:"kind"`
-	Spec DashboardspecConstantVariableSpec `json:"spec"`
+type DashboardConstantVariableKind struct {
+	Kind string                        `json:"kind"`
+	Spec DashboardConstantVariableSpec `json:"spec"`
 }
 
-// NewDashboardspecConstantVariableKind creates a new DashboardspecConstantVariableKind object.
-func NewDashboardspecConstantVariableKind() *DashboardspecConstantVariableKind {
-	return &DashboardspecConstantVariableKind{
+// NewDashboardConstantVariableKind creates a new DashboardConstantVariableKind object.
+func NewDashboardConstantVariableKind() *DashboardConstantVariableKind {
+	return &DashboardConstantVariableKind{
 		Kind: "ConstantVariable",
-		Spec: *NewDashboardspecConstantVariableSpec(),
+		Spec: *NewDashboardConstantVariableSpec(),
 	}
 }
 
 // Constant variable specification
 // +k8s:openapi-gen=true
-type DashboardspecConstantVariableSpec struct {
-	Name        string                      `json:"name"`
-	Query       string                      `json:"query"`
-	Current     DashboardspecVariableOption `json:"current"`
-	Label       *string                     `json:"label,omitempty"`
-	Hide        DashboardspecVariableHide   `json:"hide"`
-	SkipUrlSync bool                        `json:"skipUrlSync"`
-	Description *string                     `json:"description,omitempty"`
+type DashboardConstantVariableSpec struct {
+	Name        string                  `json:"name"`
+	Query       string                  `json:"query"`
+	Current     DashboardVariableOption `json:"current"`
+	Label       *string                 `json:"label,omitempty"`
+	Hide        DashboardVariableHide   `json:"hide"`
+	SkipUrlSync bool                    `json:"skipUrlSync"`
+	Description *string                 `json:"description,omitempty"`
 }
 
-// NewDashboardspecConstantVariableSpec creates a new DashboardspecConstantVariableSpec object.
-func NewDashboardspecConstantVariableSpec() *DashboardspecConstantVariableSpec {
-	return &DashboardspecConstantVariableSpec{
+// NewDashboardConstantVariableSpec creates a new DashboardConstantVariableSpec object.
+func NewDashboardConstantVariableSpec() *DashboardConstantVariableSpec {
+	return &DashboardConstantVariableSpec{
 		Name:  "",
 		Query: "",
-		Current: DashboardspecVariableOption{
+		Current: DashboardVariableOption{
 			Text: DashboardStringOrArrayOfString{
 				String: (func(input string) *string { return &input })(""),
 			},
@@ -357,52 +356,52 @@ func NewDashboardspecConstantVariableSpec() *DashboardspecConstantVariableSpec {
 				String: (func(input string) *string { return &input })(""),
 			},
 		},
-		Hide:        DashboardSpecVariableHideDontHide,
+		Hide:        DashboardVariableHideDontHide,
 		SkipUrlSync: false,
 	}
 }
 
 // Datasource variable kind
 // +k8s:openapi-gen=true
-type DashboardspecDatasourceVariableKind struct {
-	Kind string                              `json:"kind"`
-	Spec DashboardspecDatasourceVariableSpec `json:"spec"`
+type DashboardDatasourceVariableKind struct {
+	Kind string                          `json:"kind"`
+	Spec DashboardDatasourceVariableSpec `json:"spec"`
 }
 
-// NewDashboardspecDatasourceVariableKind creates a new DashboardspecDatasourceVariableKind object.
-func NewDashboardspecDatasourceVariableKind() *DashboardspecDatasourceVariableKind {
-	return &DashboardspecDatasourceVariableKind{
+// NewDashboardDatasourceVariableKind creates a new DashboardDatasourceVariableKind object.
+func NewDashboardDatasourceVariableKind() *DashboardDatasourceVariableKind {
+	return &DashboardDatasourceVariableKind{
 		Kind: "DatasourceVariable",
-		Spec: *NewDashboardspecDatasourceVariableSpec(),
+		Spec: *NewDashboardDatasourceVariableSpec(),
 	}
 }
 
 // Datasource variable specification
 // +k8s:openapi-gen=true
-type DashboardspecDatasourceVariableSpec struct {
-	Name        string                        `json:"name"`
-	PluginId    string                        `json:"pluginId"`
-	Refresh     DashboardspecVariableRefresh  `json:"refresh"`
-	Regex       string                        `json:"regex"`
-	Current     DashboardspecVariableOption   `json:"current"`
-	Options     []DashboardspecVariableOption `json:"options"`
-	Multi       bool                          `json:"multi"`
-	IncludeAll  bool                          `json:"includeAll"`
-	AllValue    *string                       `json:"allValue,omitempty"`
-	Label       *string                       `json:"label,omitempty"`
-	Hide        DashboardspecVariableHide     `json:"hide"`
-	SkipUrlSync bool                          `json:"skipUrlSync"`
-	Description *string                       `json:"description,omitempty"`
+type DashboardDatasourceVariableSpec struct {
+	Name        string                    `json:"name"`
+	PluginId    string                    `json:"pluginId"`
+	Refresh     DashboardVariableRefresh  `json:"refresh"`
+	Regex       string                    `json:"regex"`
+	Current     DashboardVariableOption   `json:"current"`
+	Options     []DashboardVariableOption `json:"options"`
+	Multi       bool                      `json:"multi"`
+	IncludeAll  bool                      `json:"includeAll"`
+	AllValue    *string                   `json:"allValue,omitempty"`
+	Label       *string                   `json:"label,omitempty"`
+	Hide        DashboardVariableHide     `json:"hide"`
+	SkipUrlSync bool                      `json:"skipUrlSync"`
+	Description *string                   `json:"description,omitempty"`
 }
 
-// NewDashboardspecDatasourceVariableSpec creates a new DashboardspecDatasourceVariableSpec object.
-func NewDashboardspecDatasourceVariableSpec() *DashboardspecDatasourceVariableSpec {
-	return &DashboardspecDatasourceVariableSpec{
+// NewDashboardDatasourceVariableSpec creates a new DashboardDatasourceVariableSpec object.
+func NewDashboardDatasourceVariableSpec() *DashboardDatasourceVariableSpec {
+	return &DashboardDatasourceVariableSpec{
 		Name:     "",
 		PluginId: "",
-		Refresh:  DashboardSpecVariableRefreshNever,
+		Refresh:  DashboardVariableRefreshNever,
 		Regex:    "",
-		Current: DashboardspecVariableOption{
+		Current: DashboardVariableOption{
 			Text: DashboardStringOrArrayOfString{
 				String: (func(input string) *string { return &input })(""),
 			},
@@ -412,49 +411,49 @@ func NewDashboardspecDatasourceVariableSpec() *DashboardspecDatasourceVariableSp
 		},
 		Multi:       false,
 		IncludeAll:  false,
-		Hide:        DashboardSpecVariableHideDontHide,
+		Hide:        DashboardVariableHideDontHide,
 		SkipUrlSync: false,
 	}
 }
 
 // Interval variable kind
 // +k8s:openapi-gen=true
-type DashboardspecIntervalVariableKind struct {
-	Kind string                            `json:"kind"`
-	Spec DashboardspecIntervalVariableSpec `json:"spec"`
+type DashboardIntervalVariableKind struct {
+	Kind string                        `json:"kind"`
+	Spec DashboardIntervalVariableSpec `json:"spec"`
 }
 
-// NewDashboardspecIntervalVariableKind creates a new DashboardspecIntervalVariableKind object.
-func NewDashboardspecIntervalVariableKind() *DashboardspecIntervalVariableKind {
-	return &DashboardspecIntervalVariableKind{
+// NewDashboardIntervalVariableKind creates a new DashboardIntervalVariableKind object.
+func NewDashboardIntervalVariableKind() *DashboardIntervalVariableKind {
+	return &DashboardIntervalVariableKind{
 		Kind: "IntervalVariable",
-		Spec: *NewDashboardspecIntervalVariableSpec(),
+		Spec: *NewDashboardIntervalVariableSpec(),
 	}
 }
 
 // Interval variable specification
 // +k8s:openapi-gen=true
-type DashboardspecIntervalVariableSpec struct {
-	Name        string                        `json:"name"`
-	Query       string                        `json:"query"`
-	Current     DashboardspecVariableOption   `json:"current"`
-	Options     []DashboardspecVariableOption `json:"options"`
-	Auto        bool                          `json:"auto"`
-	AutoMin     string                        `json:"auto_min"`
-	AutoCount   int64                         `json:"auto_count"`
-	Refresh     DashboardspecVariableRefresh  `json:"refresh"`
-	Label       *string                       `json:"label,omitempty"`
-	Hide        DashboardspecVariableHide     `json:"hide"`
-	SkipUrlSync bool                          `json:"skipUrlSync"`
-	Description *string                       `json:"description,omitempty"`
+type DashboardIntervalVariableSpec struct {
+	Name        string                    `json:"name"`
+	Query       string                    `json:"query"`
+	Current     DashboardVariableOption   `json:"current"`
+	Options     []DashboardVariableOption `json:"options"`
+	Auto        bool                      `json:"auto"`
+	AutoMin     string                    `json:"auto_min"`
+	AutoCount   int64                     `json:"auto_count"`
+	Refresh     DashboardVariableRefresh  `json:"refresh"`
+	Label       *string                   `json:"label,omitempty"`
+	Hide        DashboardVariableHide     `json:"hide"`
+	SkipUrlSync bool                      `json:"skipUrlSync"`
+	Description *string                   `json:"description,omitempty"`
 }
 
-// NewDashboardspecIntervalVariableSpec creates a new DashboardspecIntervalVariableSpec object.
-func NewDashboardspecIntervalVariableSpec() *DashboardspecIntervalVariableSpec {
-	return &DashboardspecIntervalVariableSpec{
+// NewDashboardIntervalVariableSpec creates a new DashboardIntervalVariableSpec object.
+func NewDashboardIntervalVariableSpec() *DashboardIntervalVariableSpec {
+	return &DashboardIntervalVariableSpec{
 		Name:  "",
 		Query: "",
-		Current: DashboardspecVariableOption{
+		Current: DashboardVariableOption{
 			Text: DashboardStringOrArrayOfString{
 				String: (func(input string) *string { return &input })(""),
 			},
@@ -465,90 +464,90 @@ func NewDashboardspecIntervalVariableSpec() *DashboardspecIntervalVariableSpec {
 		Auto:        false,
 		AutoMin:     "",
 		AutoCount:   0,
-		Refresh:     DashboardSpecVariableRefreshNever,
-		Hide:        DashboardSpecVariableHideDontHide,
+		Refresh:     DashboardVariableRefreshNever,
+		Hide:        DashboardVariableHideDontHide,
 		SkipUrlSync: false,
 	}
 }
 
 // Custom variable kind
 // +k8s:openapi-gen=true
-type DashboardspecCustomVariableKind struct {
-	Kind string                          `json:"kind"`
-	Spec DashboardspecCustomVariableSpec `json:"spec"`
+type DashboardCustomVariableKind struct {
+	Kind string                      `json:"kind"`
+	Spec DashboardCustomVariableSpec `json:"spec"`
 }
 
-// NewDashboardspecCustomVariableKind creates a new DashboardspecCustomVariableKind object.
-func NewDashboardspecCustomVariableKind() *DashboardspecCustomVariableKind {
-	return &DashboardspecCustomVariableKind{
+// NewDashboardCustomVariableKind creates a new DashboardCustomVariableKind object.
+func NewDashboardCustomVariableKind() *DashboardCustomVariableKind {
+	return &DashboardCustomVariableKind{
 		Kind: "CustomVariable",
-		Spec: *NewDashboardspecCustomVariableSpec(),
+		Spec: *NewDashboardCustomVariableSpec(),
 	}
 }
 
 // Custom variable specification
 // +k8s:openapi-gen=true
-type DashboardspecCustomVariableSpec struct {
-	Name        string                        `json:"name"`
-	Query       string                        `json:"query"`
-	Current     DashboardspecVariableOption   `json:"current"`
-	Options     []DashboardspecVariableOption `json:"options"`
-	Multi       bool                          `json:"multi"`
-	IncludeAll  bool                          `json:"includeAll"`
-	AllValue    *string                       `json:"allValue,omitempty"`
-	Label       *string                       `json:"label,omitempty"`
-	Hide        DashboardspecVariableHide     `json:"hide"`
-	SkipUrlSync bool                          `json:"skipUrlSync"`
-	Description *string                       `json:"description,omitempty"`
+type DashboardCustomVariableSpec struct {
+	Name        string                    `json:"name"`
+	Query       string                    `json:"query"`
+	Current     DashboardVariableOption   `json:"current"`
+	Options     []DashboardVariableOption `json:"options"`
+	Multi       bool                      `json:"multi"`
+	IncludeAll  bool                      `json:"includeAll"`
+	AllValue    *string                   `json:"allValue,omitempty"`
+	Label       *string                   `json:"label,omitempty"`
+	Hide        DashboardVariableHide     `json:"hide"`
+	SkipUrlSync bool                      `json:"skipUrlSync"`
+	Description *string                   `json:"description,omitempty"`
 }
 
-// NewDashboardspecCustomVariableSpec creates a new DashboardspecCustomVariableSpec object.
-func NewDashboardspecCustomVariableSpec() *DashboardspecCustomVariableSpec {
-	return &DashboardspecCustomVariableSpec{
+// NewDashboardCustomVariableSpec creates a new DashboardCustomVariableSpec object.
+func NewDashboardCustomVariableSpec() *DashboardCustomVariableSpec {
+	return &DashboardCustomVariableSpec{
 		Name:        "",
 		Query:       "",
-		Current:     *NewDashboardspecVariableOption(),
+		Current:     *NewDashboardVariableOption(),
 		Multi:       false,
 		IncludeAll:  false,
-		Hide:        DashboardSpecVariableHideDontHide,
+		Hide:        DashboardVariableHideDontHide,
 		SkipUrlSync: false,
 	}
 }
 
 // Group variable kind
 // +k8s:openapi-gen=true
-type DashboardspecGroupByVariableKind struct {
-	Kind string                           `json:"kind"`
-	Spec DashboardspecGroupByVariableSpec `json:"spec"`
+type DashboardGroupByVariableKind struct {
+	Kind string                       `json:"kind"`
+	Spec DashboardGroupByVariableSpec `json:"spec"`
 }
 
-// NewDashboardspecGroupByVariableKind creates a new DashboardspecGroupByVariableKind object.
-func NewDashboardspecGroupByVariableKind() *DashboardspecGroupByVariableKind {
-	return &DashboardspecGroupByVariableKind{
+// NewDashboardGroupByVariableKind creates a new DashboardGroupByVariableKind object.
+func NewDashboardGroupByVariableKind() *DashboardGroupByVariableKind {
+	return &DashboardGroupByVariableKind{
 		Kind: "GroupByVariable",
-		Spec: *NewDashboardspecGroupByVariableSpec(),
+		Spec: *NewDashboardGroupByVariableSpec(),
 	}
 }
 
 // GroupBy variable specification
 // +k8s:openapi-gen=true
-type DashboardspecGroupByVariableSpec struct {
-	Name        string                        `json:"name"`
-	Datasource  *DashboardspecDataSourceRef   `json:"datasource,omitempty"`
-	Current     DashboardspecVariableOption   `json:"current"`
-	Options     []DashboardspecVariableOption `json:"options"`
-	Multi       bool                          `json:"multi"`
-	Label       *string                       `json:"label,omitempty"`
-	Hide        DashboardspecVariableHide     `json:"hide"`
-	SkipUrlSync bool                          `json:"skipUrlSync"`
-	Description *string                       `json:"description,omitempty"`
+type DashboardGroupByVariableSpec struct {
+	Name        string                    `json:"name"`
+	Datasource  *DashboardDataSourceRef   `json:"datasource,omitempty"`
+	Current     DashboardVariableOption   `json:"current"`
+	Options     []DashboardVariableOption `json:"options"`
+	Multi       bool                      `json:"multi"`
+	Label       *string                   `json:"label,omitempty"`
+	Hide        DashboardVariableHide     `json:"hide"`
+	SkipUrlSync bool                      `json:"skipUrlSync"`
+	Description *string                   `json:"description,omitempty"`
 }
 
-// NewDashboardspecGroupByVariableSpec creates a new DashboardspecGroupByVariableSpec object.
-func NewDashboardspecGroupByVariableSpec() *DashboardspecGroupByVariableSpec {
-	return &DashboardspecGroupByVariableSpec{
+// NewDashboardGroupByVariableSpec creates a new DashboardGroupByVariableSpec object.
+func NewDashboardGroupByVariableSpec() *DashboardGroupByVariableSpec {
+	return &DashboardGroupByVariableSpec{
 		Name: "",
-		Current: DashboardspecVariableOption{
+		Current: DashboardVariableOption{
 			Text: DashboardStringOrArrayOfString{
 				String: (func(input string) *string { return &input })(""),
 			},
@@ -557,52 +556,52 @@ func NewDashboardspecGroupByVariableSpec() *DashboardspecGroupByVariableSpec {
 			},
 		},
 		Multi:       false,
-		Hide:        DashboardSpecVariableHideDontHide,
+		Hide:        DashboardVariableHideDontHide,
 		SkipUrlSync: false,
 	}
 }
 
 // Adhoc variable kind
 // +k8s:openapi-gen=true
-type DashboardspecAdhocVariableKind struct {
-	Kind string                         `json:"kind"`
-	Spec DashboardspecAdhocVariableSpec `json:"spec"`
+type DashboardAdhocVariableKind struct {
+	Kind string                     `json:"kind"`
+	Spec DashboardAdhocVariableSpec `json:"spec"`
 }
 
-// NewDashboardspecAdhocVariableKind creates a new DashboardspecAdhocVariableKind object.
-func NewDashboardspecAdhocVariableKind() *DashboardspecAdhocVariableKind {
-	return &DashboardspecAdhocVariableKind{
+// NewDashboardAdhocVariableKind creates a new DashboardAdhocVariableKind object.
+func NewDashboardAdhocVariableKind() *DashboardAdhocVariableKind {
+	return &DashboardAdhocVariableKind{
 		Kind: "AdhocVariable",
-		Spec: *NewDashboardspecAdhocVariableSpec(),
+		Spec: *NewDashboardAdhocVariableSpec(),
 	}
 }
 
 // Adhoc variable specification
 // +k8s:openapi-gen=true
-type DashboardspecAdhocVariableSpec struct {
-	Name        string                               `json:"name"`
-	Datasource  *DashboardspecDataSourceRef          `json:"datasource,omitempty"`
-	BaseFilters []DashboardspecAdHocFilterWithLabels `json:"baseFilters"`
-	Filters     []DashboardspecAdHocFilterWithLabels `json:"filters"`
-	DefaultKeys []DashboardspecMetricFindValue       `json:"defaultKeys"`
-	Label       *string                              `json:"label,omitempty"`
-	Hide        DashboardspecVariableHide            `json:"hide"`
-	SkipUrlSync bool                                 `json:"skipUrlSync"`
-	Description *string                              `json:"description,omitempty"`
+type DashboardAdhocVariableSpec struct {
+	Name        string                           `json:"name"`
+	Datasource  *DashboardDataSourceRef          `json:"datasource,omitempty"`
+	BaseFilters []DashboardAdHocFilterWithLabels `json:"baseFilters"`
+	Filters     []DashboardAdHocFilterWithLabels `json:"filters"`
+	DefaultKeys []DashboardMetricFindValue       `json:"defaultKeys"`
+	Label       *string                          `json:"label,omitempty"`
+	Hide        DashboardVariableHide            `json:"hide"`
+	SkipUrlSync bool                             `json:"skipUrlSync"`
+	Description *string                          `json:"description,omitempty"`
 }
 
-// NewDashboardspecAdhocVariableSpec creates a new DashboardspecAdhocVariableSpec object.
-func NewDashboardspecAdhocVariableSpec() *DashboardspecAdhocVariableSpec {
-	return &DashboardspecAdhocVariableSpec{
+// NewDashboardAdhocVariableSpec creates a new DashboardAdhocVariableSpec object.
+func NewDashboardAdhocVariableSpec() *DashboardAdhocVariableSpec {
+	return &DashboardAdhocVariableSpec{
 		Name:        "",
-		Hide:        DashboardSpecVariableHideDontHide,
+		Hide:        DashboardVariableHideDontHide,
 		SkipUrlSync: false,
 	}
 }
 
 // Define the AdHocFilterWithLabels type
 // +k8s:openapi-gen=true
-type DashboardspecAdHocFilterWithLabels struct {
+type DashboardAdHocFilterWithLabels struct {
 	Key         string   `json:"key"`
 	Operator    string   `json:"operator"`
 	Value       string   `json:"value"`
@@ -614,148 +613,148 @@ type DashboardspecAdHocFilterWithLabels struct {
 	Condition *string `json:"condition,omitempty"`
 }
 
-// NewDashboardspecAdHocFilterWithLabels creates a new DashboardspecAdHocFilterWithLabels object.
-func NewDashboardspecAdHocFilterWithLabels() *DashboardspecAdHocFilterWithLabels {
-	return &DashboardspecAdHocFilterWithLabels{}
+// NewDashboardAdHocFilterWithLabels creates a new DashboardAdHocFilterWithLabels object.
+func NewDashboardAdHocFilterWithLabels() *DashboardAdHocFilterWithLabels {
+	return &DashboardAdHocFilterWithLabels{}
 }
 
 // Define the MetricFindValue type
 // +k8s:openapi-gen=true
-type DashboardspecMetricFindValue struct {
+type DashboardMetricFindValue struct {
 	Text       string                    `json:"text"`
 	Value      *DashboardStringOrFloat64 `json:"value,omitempty"`
 	Group      *string                   `json:"group,omitempty"`
 	Expandable *bool                     `json:"expandable,omitempty"`
 }
 
-// NewDashboardspecMetricFindValue creates a new DashboardspecMetricFindValue object.
-func NewDashboardspecMetricFindValue() *DashboardspecMetricFindValue {
-	return &DashboardspecMetricFindValue{}
+// NewDashboardMetricFindValue creates a new DashboardMetricFindValue object.
+func NewDashboardMetricFindValue() *DashboardMetricFindValue {
+	return &DashboardMetricFindValue{}
 }
 
 // Supported dashboard elements
 // |* more element types in the future
 // +k8s:openapi-gen=true
-type DashboardspecElement = DashboardSpecPanelKindOrSpecLibraryPanelKind
+type DashboardElement = DashboardPanelKindOrLibraryPanelKind
 
-// NewDashboardspecElement creates a new DashboardspecElement object.
-func NewDashboardspecElement() *DashboardspecElement {
-	return NewDashboardSpecPanelKindOrSpecLibraryPanelKind()
+// NewDashboardElement creates a new DashboardElement object.
+func NewDashboardElement() *DashboardElement {
+	return NewDashboardPanelKindOrLibraryPanelKind()
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecPanelKind struct {
-	Kind string                 `json:"kind"`
-	Spec DashboardspecPanelSpec `json:"spec"`
+type DashboardPanelKind struct {
+	Kind string             `json:"kind"`
+	Spec DashboardPanelSpec `json:"spec"`
 }
 
-// NewDashboardspecPanelKind creates a new DashboardspecPanelKind object.
-func NewDashboardspecPanelKind() *DashboardspecPanelKind {
-	return &DashboardspecPanelKind{
+// NewDashboardPanelKind creates a new DashboardPanelKind object.
+func NewDashboardPanelKind() *DashboardPanelKind {
+	return &DashboardPanelKind{
 		Kind: "Panel",
-		Spec: *NewDashboardspecPanelSpec(),
+		Spec: *NewDashboardPanelSpec(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecPanelSpec struct {
-	Id          float64                     `json:"id"`
-	Title       string                      `json:"title"`
-	Description string                      `json:"description"`
-	Links       []DashboardspecDataLink     `json:"links"`
-	Data        DashboardspecQueryGroupKind `json:"data"`
-	VizConfig   DashboardspecVizConfigKind  `json:"vizConfig"`
-	Transparent *bool                       `json:"transparent,omitempty"`
+type DashboardPanelSpec struct {
+	Id          float64                 `json:"id"`
+	Title       string                  `json:"title"`
+	Description string                  `json:"description"`
+	Links       []DashboardDataLink     `json:"links"`
+	Data        DashboardQueryGroupKind `json:"data"`
+	VizConfig   DashboardVizConfigKind  `json:"vizConfig"`
+	Transparent *bool                   `json:"transparent,omitempty"`
 }
 
-// NewDashboardspecPanelSpec creates a new DashboardspecPanelSpec object.
-func NewDashboardspecPanelSpec() *DashboardspecPanelSpec {
-	return &DashboardspecPanelSpec{
-		Data:      *NewDashboardspecQueryGroupKind(),
-		VizConfig: *NewDashboardspecVizConfigKind(),
+// NewDashboardPanelSpec creates a new DashboardPanelSpec object.
+func NewDashboardPanelSpec() *DashboardPanelSpec {
+	return &DashboardPanelSpec{
+		Data:      *NewDashboardQueryGroupKind(),
+		VizConfig: *NewDashboardVizConfigKind(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecDataLink struct {
+type DashboardDataLink struct {
 	Title       string `json:"title"`
 	Url         string `json:"url"`
 	TargetBlank *bool  `json:"targetBlank,omitempty"`
 }
 
-// NewDashboardspecDataLink creates a new DashboardspecDataLink object.
-func NewDashboardspecDataLink() *DashboardspecDataLink {
-	return &DashboardspecDataLink{}
+// NewDashboardDataLink creates a new DashboardDataLink object.
+func NewDashboardDataLink() *DashboardDataLink {
+	return &DashboardDataLink{}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecQueryGroupKind struct {
-	Kind string                      `json:"kind"`
-	Spec DashboardspecQueryGroupSpec `json:"spec"`
+type DashboardQueryGroupKind struct {
+	Kind string                  `json:"kind"`
+	Spec DashboardQueryGroupSpec `json:"spec"`
 }
 
-// NewDashboardspecQueryGroupKind creates a new DashboardspecQueryGroupKind object.
-func NewDashboardspecQueryGroupKind() *DashboardspecQueryGroupKind {
-	return &DashboardspecQueryGroupKind{
+// NewDashboardQueryGroupKind creates a new DashboardQueryGroupKind object.
+func NewDashboardQueryGroupKind() *DashboardQueryGroupKind {
+	return &DashboardQueryGroupKind{
 		Kind: "QueryGroup",
-		Spec: *NewDashboardspecQueryGroupSpec(),
+		Spec: *NewDashboardQueryGroupSpec(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecQueryGroupSpec struct {
-	Queries         []DashboardspecPanelQueryKind     `json:"queries"`
-	Transformations []DashboardspecTransformationKind `json:"transformations"`
-	QueryOptions    DashboardspecQueryOptionsSpec     `json:"queryOptions"`
+type DashboardQueryGroupSpec struct {
+	Queries         []DashboardPanelQueryKind     `json:"queries"`
+	Transformations []DashboardTransformationKind `json:"transformations"`
+	QueryOptions    DashboardQueryOptionsSpec     `json:"queryOptions"`
 }
 
-// NewDashboardspecQueryGroupSpec creates a new DashboardspecQueryGroupSpec object.
-func NewDashboardspecQueryGroupSpec() *DashboardspecQueryGroupSpec {
-	return &DashboardspecQueryGroupSpec{
-		QueryOptions: *NewDashboardspecQueryOptionsSpec(),
+// NewDashboardQueryGroupSpec creates a new DashboardQueryGroupSpec object.
+func NewDashboardQueryGroupSpec() *DashboardQueryGroupSpec {
+	return &DashboardQueryGroupSpec{
+		QueryOptions: *NewDashboardQueryOptionsSpec(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecPanelQueryKind struct {
-	Kind string                      `json:"kind"`
-	Spec DashboardspecPanelQuerySpec `json:"spec"`
+type DashboardPanelQueryKind struct {
+	Kind string                  `json:"kind"`
+	Spec DashboardPanelQuerySpec `json:"spec"`
 }
 
-// NewDashboardspecPanelQueryKind creates a new DashboardspecPanelQueryKind object.
-func NewDashboardspecPanelQueryKind() *DashboardspecPanelQueryKind {
-	return &DashboardspecPanelQueryKind{
+// NewDashboardPanelQueryKind creates a new DashboardPanelQueryKind object.
+func NewDashboardPanelQueryKind() *DashboardPanelQueryKind {
+	return &DashboardPanelQueryKind{
 		Kind: "PanelQuery",
-		Spec: *NewDashboardspecPanelQuerySpec(),
+		Spec: *NewDashboardPanelQuerySpec(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecPanelQuerySpec struct {
-	Query      DashboardspecDataQueryKind  `json:"query"`
-	Datasource *DashboardspecDataSourceRef `json:"datasource,omitempty"`
-	RefId      string                      `json:"refId"`
-	Hidden     bool                        `json:"hidden"`
+type DashboardPanelQuerySpec struct {
+	Query      DashboardDataQueryKind  `json:"query"`
+	Datasource *DashboardDataSourceRef `json:"datasource,omitempty"`
+	RefId      string                  `json:"refId"`
+	Hidden     bool                    `json:"hidden"`
 }
 
-// NewDashboardspecPanelQuerySpec creates a new DashboardspecPanelQuerySpec object.
-func NewDashboardspecPanelQuerySpec() *DashboardspecPanelQuerySpec {
-	return &DashboardspecPanelQuerySpec{
-		Query: *NewDashboardspecDataQueryKind(),
+// NewDashboardPanelQuerySpec creates a new DashboardPanelQuerySpec object.
+func NewDashboardPanelQuerySpec() *DashboardPanelQuerySpec {
+	return &DashboardPanelQuerySpec{
+		Query: *NewDashboardDataQueryKind(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecTransformationKind struct {
+type DashboardTransformationKind struct {
 	// The kind of a TransformationKind is the transformation ID
-	Kind string                             `json:"kind"`
-	Spec DashboardspecDataTransformerConfig `json:"spec"`
+	Kind string                         `json:"kind"`
+	Spec DashboardDataTransformerConfig `json:"spec"`
 }
 
-// NewDashboardspecTransformationKind creates a new DashboardspecTransformationKind object.
-func NewDashboardspecTransformationKind() *DashboardspecTransformationKind {
-	return &DashboardspecTransformationKind{
-		Spec: *NewDashboardspecDataTransformerConfig(),
+// NewDashboardTransformationKind creates a new DashboardTransformationKind object.
+func NewDashboardTransformationKind() *DashboardTransformationKind {
+	return &DashboardTransformationKind{
+		Spec: *NewDashboardDataTransformerConfig(),
 	}
 }
 
@@ -763,44 +762,55 @@ func NewDashboardspecTransformationKind() *DashboardspecTransformationKind {
 // Using transformations you can: rename fields, join time series data, perform mathematical operations across queries,
 // use the output of one transformation as the input to another transformation, etc.
 // +k8s:openapi-gen=true
-type DashboardspecDataTransformerConfig struct {
+type DashboardDataTransformerConfig struct {
 	// Unique identifier of transformer
 	Id string `json:"id"`
 	// Disabled transformations are skipped
 	Disabled *bool `json:"disabled,omitempty"`
 	// Optional frame matcher. When missing it will be applied to all results
-	Filter *DashboardspecMatcherConfig `json:"filter,omitempty"`
+	Filter *DashboardMatcherConfig `json:"filter,omitempty"`
 	// Where to pull DataFrames from as input to transformation
-	Topic *common.DashboardDataTopic `json:"topic,omitempty"`
+	Topic *DashboardDataTopic `json:"topic,omitempty"`
 	// Options to be passed to the transformer
 	// Valid options depend on the transformer id
 	Options interface{} `json:"options"`
 }
 
-// NewDashboardspecDataTransformerConfig creates a new DashboardspecDataTransformerConfig object.
-func NewDashboardspecDataTransformerConfig() *DashboardspecDataTransformerConfig {
-	return &DashboardspecDataTransformerConfig{}
+// NewDashboardDataTransformerConfig creates a new DashboardDataTransformerConfig object.
+func NewDashboardDataTransformerConfig() *DashboardDataTransformerConfig {
+	return &DashboardDataTransformerConfig{}
 }
 
 // Matcher is a predicate configuration. Based on the config a set of field(s) or values is filtered in order to apply override / transformation.
 // It comes with in id ( to resolve implementation from registry) and a configuration that’s specific to a particular matcher type.
 // +k8s:openapi-gen=true
-type DashboardspecMatcherConfig struct {
+type DashboardMatcherConfig struct {
 	// The matcher id. This is used to find the matcher implementation from registry.
 	Id string `json:"id"`
 	// The matcher options. This is specific to the matcher implementation.
 	Options interface{} `json:"options,omitempty"`
 }
 
-// NewDashboardspecMatcherConfig creates a new DashboardspecMatcherConfig object.
-func NewDashboardspecMatcherConfig() *DashboardspecMatcherConfig {
-	return &DashboardspecMatcherConfig{
+// NewDashboardMatcherConfig creates a new DashboardMatcherConfig object.
+func NewDashboardMatcherConfig() *DashboardMatcherConfig {
+	return &DashboardMatcherConfig{
 		Id: "",
 	}
 }
 
+// A topic is attached to DataFrame metadata in query results.
+// This specifies where the data should be used.
 // +k8s:openapi-gen=true
-type DashboardspecQueryOptionsSpec struct {
+type DashboardDataTopic string
+
+const (
+	DashboardDataTopicSeries      DashboardDataTopic = "series"
+	DashboardDataTopicAnnotations DashboardDataTopic = "annotations"
+	DashboardDataTopicAlertStates DashboardDataTopic = "alertStates"
+)
+
+// +k8s:openapi-gen=true
+type DashboardQueryOptionsSpec struct {
 	TimeFrom         *string `json:"timeFrom,omitempty"`
 	MaxDataPoints    *int64  `json:"maxDataPoints,omitempty"`
 	TimeShift        *string `json:"timeShift,omitempty"`
@@ -810,37 +820,37 @@ type DashboardspecQueryOptionsSpec struct {
 	HideTimeOverride *bool   `json:"hideTimeOverride,omitempty"`
 }
 
-// NewDashboardspecQueryOptionsSpec creates a new DashboardspecQueryOptionsSpec object.
-func NewDashboardspecQueryOptionsSpec() *DashboardspecQueryOptionsSpec {
-	return &DashboardspecQueryOptionsSpec{}
+// NewDashboardQueryOptionsSpec creates a new DashboardQueryOptionsSpec object.
+func NewDashboardQueryOptionsSpec() *DashboardQueryOptionsSpec {
+	return &DashboardQueryOptionsSpec{}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecVizConfigKind struct {
+type DashboardVizConfigKind struct {
 	// The kind of a VizConfigKind is the plugin ID
-	Kind string                     `json:"kind"`
-	Spec DashboardspecVizConfigSpec `json:"spec"`
+	Kind string                 `json:"kind"`
+	Spec DashboardVizConfigSpec `json:"spec"`
 }
 
-// NewDashboardspecVizConfigKind creates a new DashboardspecVizConfigKind object.
-func NewDashboardspecVizConfigKind() *DashboardspecVizConfigKind {
-	return &DashboardspecVizConfigKind{
-		Spec: *NewDashboardspecVizConfigSpec(),
+// NewDashboardVizConfigKind creates a new DashboardVizConfigKind object.
+func NewDashboardVizConfigKind() *DashboardVizConfigKind {
+	return &DashboardVizConfigKind{
+		Spec: *NewDashboardVizConfigSpec(),
 	}
 }
 
 // --- Kinds ---
 // +k8s:openapi-gen=true
-type DashboardspecVizConfigSpec struct {
-	PluginVersion string                         `json:"pluginVersion"`
-	Options       map[string]interface{}         `json:"options"`
-	FieldConfig   DashboardspecFieldConfigSource `json:"fieldConfig"`
+type DashboardVizConfigSpec struct {
+	PluginVersion string                     `json:"pluginVersion"`
+	Options       map[string]interface{}     `json:"options"`
+	FieldConfig   DashboardFieldConfigSource `json:"fieldConfig"`
 }
 
-// NewDashboardspecVizConfigSpec creates a new DashboardspecVizConfigSpec object.
-func NewDashboardspecVizConfigSpec() *DashboardspecVizConfigSpec {
-	return &DashboardspecVizConfigSpec{
-		FieldConfig: *NewDashboardspecFieldConfigSource(),
+// NewDashboardVizConfigSpec creates a new DashboardVizConfigSpec object.
+func NewDashboardVizConfigSpec() *DashboardVizConfigSpec {
+	return &DashboardVizConfigSpec{
+		FieldConfig: *NewDashboardFieldConfigSource(),
 	}
 }
 
@@ -848,17 +858,17 @@ func NewDashboardspecVizConfigSpec() *DashboardspecVizConfigSpec {
 // Each column within this structure is called a field. A field can represent a single time series or table column.
 // Field options allow you to change how the data is displayed in your visualizations.
 // +k8s:openapi-gen=true
-type DashboardspecFieldConfigSource struct {
+type DashboardFieldConfigSource struct {
 	// Defaults are the options applied to all fields.
-	Defaults DashboardspecFieldConfig `json:"defaults"`
+	Defaults DashboardFieldConfig `json:"defaults"`
 	// Overrides are the options applied to specific fields overriding the defaults.
-	Overrides []DashboardV2alpha1SpecFieldConfigSourceOverrides `json:"overrides"`
+	Overrides []DashboardV2alpha1FieldConfigSourceOverrides `json:"overrides"`
 }
 
-// NewDashboardspecFieldConfigSource creates a new DashboardspecFieldConfigSource object.
-func NewDashboardspecFieldConfigSource() *DashboardspecFieldConfigSource {
-	return &DashboardspecFieldConfigSource{
-		Defaults: *NewDashboardspecFieldConfig(),
+// NewDashboardFieldConfigSource creates a new DashboardFieldConfigSource object.
+func NewDashboardFieldConfigSource() *DashboardFieldConfigSource {
+	return &DashboardFieldConfigSource{
+		Defaults: *NewDashboardFieldConfig(),
 	}
 }
 
@@ -866,7 +876,7 @@ func NewDashboardspecFieldConfigSource() *DashboardspecFieldConfigSource {
 // Each column within this structure is called a field. A field can represent a single time series or table column.
 // Field options allow you to change how the data is displayed in your visualizations.
 // +k8s:openapi-gen=true
-type DashboardspecFieldConfig struct {
+type DashboardFieldConfig struct {
 	// The display value for this field.  This supports template variables blank is auto
 	DisplayName *string `json:"displayName,omitempty"`
 	// This can be used by data sources that return and explicit naming structure for values and labels
@@ -905,11 +915,11 @@ type DashboardspecFieldConfig struct {
 	// The maximum value used in percentage threshold calculations. Leave blank for auto calculation based on all series and fields.
 	Max *float64 `json:"max,omitempty"`
 	// Convert input values into a display string
-	Mappings []DashboardspecValueMapping `json:"mappings,omitempty"`
+	Mappings []DashboardValueMapping `json:"mappings,omitempty"`
 	// Map numeric values to states
-	Thresholds *DashboardspecThresholdsConfig `json:"thresholds,omitempty"`
+	Thresholds *DashboardThresholdsConfig `json:"thresholds,omitempty"`
 	// Panel color configuration
-	Color *DashboardspecFieldColor `json:"color,omitempty"`
+	Color *DashboardFieldColor `json:"color,omitempty"`
 	// The behavior when clicking on a result
 	Links []interface{} `json:"links,omitempty"`
 	// Alternative to empty string
@@ -919,38 +929,38 @@ type DashboardspecFieldConfig struct {
 	Custom map[string]interface{} `json:"custom,omitempty"`
 }
 
-// NewDashboardspecFieldConfig creates a new DashboardspecFieldConfig object.
-func NewDashboardspecFieldConfig() *DashboardspecFieldConfig {
-	return &DashboardspecFieldConfig{}
+// NewDashboardFieldConfig creates a new DashboardFieldConfig object.
+func NewDashboardFieldConfig() *DashboardFieldConfig {
+	return &DashboardFieldConfig{}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecValueMapping = DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap
+type DashboardValueMapping = DashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap
 
-// NewDashboardspecValueMapping creates a new DashboardspecValueMapping object.
-func NewDashboardspecValueMapping() *DashboardspecValueMapping {
-	return NewDashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap()
+// NewDashboardValueMapping creates a new DashboardValueMapping object.
+func NewDashboardValueMapping() *DashboardValueMapping {
+	return NewDashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap()
 }
 
 // Maps text values to a color or different display text and color.
 // For example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.
 // +k8s:openapi-gen=true
-type DashboardspecValueMap struct {
+type DashboardValueMap struct {
 	Type string `json:"type"`
 	// Map with <value_to_match>: ValueMappingResult. For example: { "10": { text: "Perfection!", color: "green" } }
-	Options map[string]DashboardspecValueMappingResult `json:"options"`
+	Options map[string]DashboardValueMappingResult `json:"options"`
 }
 
-// NewDashboardspecValueMap creates a new DashboardspecValueMap object.
-func NewDashboardspecValueMap() *DashboardspecValueMap {
-	return &DashboardspecValueMap{
+// NewDashboardValueMap creates a new DashboardValueMap object.
+func NewDashboardValueMap() *DashboardValueMap {
+	return &DashboardValueMap{
 		Type: "value",
 	}
 }
 
 // Result used as replacement with text and color when the value matches
 // +k8s:openapi-gen=true
-type DashboardspecValueMappingResult struct {
+type DashboardValueMappingResult struct {
 	// Text to display when the value matches
 	Text *string `json:"text,omitempty"`
 	// Text to use when the value matches
@@ -961,42 +971,42 @@ type DashboardspecValueMappingResult struct {
 	Index *int32 `json:"index,omitempty"`
 }
 
-// NewDashboardspecValueMappingResult creates a new DashboardspecValueMappingResult object.
-func NewDashboardspecValueMappingResult() *DashboardspecValueMappingResult {
-	return &DashboardspecValueMappingResult{}
+// NewDashboardValueMappingResult creates a new DashboardValueMappingResult object.
+func NewDashboardValueMappingResult() *DashboardValueMappingResult {
+	return &DashboardValueMappingResult{}
 }
 
 // Maps numerical ranges to a display text and color.
 // For example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.
 // +k8s:openapi-gen=true
-type DashboardspecRangeMap struct {
+type DashboardRangeMap struct {
 	Type string `json:"type"`
 	// Range to match against and the result to apply when the value is within the range
-	Options DashboardV2alpha1SpecRangeMapOptions `json:"options"`
+	Options DashboardV2alpha1RangeMapOptions `json:"options"`
 }
 
-// NewDashboardspecRangeMap creates a new DashboardspecRangeMap object.
-func NewDashboardspecRangeMap() *DashboardspecRangeMap {
-	return &DashboardspecRangeMap{
+// NewDashboardRangeMap creates a new DashboardRangeMap object.
+func NewDashboardRangeMap() *DashboardRangeMap {
+	return &DashboardRangeMap{
 		Type:    "range",
-		Options: *NewDashboardV2alpha1SpecRangeMapOptions(),
+		Options: *NewDashboardV2alpha1RangeMapOptions(),
 	}
 }
 
 // Maps regular expressions to replacement text and a color.
 // For example, if a value is www.example.com, you can configure a regex value mapping so that Grafana displays www and truncates the domain.
 // +k8s:openapi-gen=true
-type DashboardspecRegexMap struct {
+type DashboardRegexMap struct {
 	Type string `json:"type"`
 	// Regular expression to match against and the result to apply when the value matches the regex
-	Options DashboardV2alpha1SpecRegexMapOptions `json:"options"`
+	Options DashboardV2alpha1RegexMapOptions `json:"options"`
 }
 
-// NewDashboardspecRegexMap creates a new DashboardspecRegexMap object.
-func NewDashboardspecRegexMap() *DashboardspecRegexMap {
-	return &DashboardspecRegexMap{
+// NewDashboardRegexMap creates a new DashboardRegexMap object.
+func NewDashboardRegexMap() *DashboardRegexMap {
+	return &DashboardRegexMap{
 		Type:    "regex",
-		Options: *NewDashboardV2alpha1SpecRegexMapOptions(),
+		Options: *NewDashboardV2alpha1RegexMapOptions(),
 	}
 }
 
@@ -1004,76 +1014,76 @@ func NewDashboardspecRegexMap() *DashboardspecRegexMap {
 // See SpecialValueMatch to see the list of special values.
 // For example, you can configure a special value mapping so that null values appear as N/A.
 // +k8s:openapi-gen=true
-type DashboardspecSpecialValueMap struct {
-	Type    string                                      `json:"type"`
-	Options DashboardV2alpha1SpecSpecialValueMapOptions `json:"options"`
+type DashboardSpecialValueMap struct {
+	Type    string                                  `json:"type"`
+	Options DashboardV2alpha1SpecialValueMapOptions `json:"options"`
 }
 
-// NewDashboardspecSpecialValueMap creates a new DashboardspecSpecialValueMap object.
-func NewDashboardspecSpecialValueMap() *DashboardspecSpecialValueMap {
-	return &DashboardspecSpecialValueMap{
+// NewDashboardSpecialValueMap creates a new DashboardSpecialValueMap object.
+func NewDashboardSpecialValueMap() *DashboardSpecialValueMap {
+	return &DashboardSpecialValueMap{
 		Type:    "special",
-		Options: *NewDashboardV2alpha1SpecSpecialValueMapOptions(),
+		Options: *NewDashboardV2alpha1SpecialValueMapOptions(),
 	}
 }
 
 // Special value types supported by the `SpecialValueMap`
 // +k8s:openapi-gen=true
-type DashboardspecSpecialValueMatch string
+type DashboardSpecialValueMatch string
 
 const (
-	DashboardSpecSpecialValueMatchTrue       DashboardspecSpecialValueMatch = "true"
-	DashboardSpecSpecialValueMatchFalse      DashboardspecSpecialValueMatch = "false"
-	DashboardSpecSpecialValueMatchNull       DashboardspecSpecialValueMatch = "null"
-	DashboardSpecSpecialValueMatchNaN        DashboardspecSpecialValueMatch = "nan"
-	DashboardSpecSpecialValueMatchNullAndNaN DashboardspecSpecialValueMatch = "null+nan"
-	DashboardSpecSpecialValueMatchEmpty      DashboardspecSpecialValueMatch = "empty"
+	DashboardSpecialValueMatchTrue       DashboardSpecialValueMatch = "true"
+	DashboardSpecialValueMatchFalse      DashboardSpecialValueMatch = "false"
+	DashboardSpecialValueMatchNull       DashboardSpecialValueMatch = "null"
+	DashboardSpecialValueMatchNaN        DashboardSpecialValueMatch = "nan"
+	DashboardSpecialValueMatchNullAndNaN DashboardSpecialValueMatch = "null+nan"
+	DashboardSpecialValueMatchEmpty      DashboardSpecialValueMatch = "empty"
 )
 
 // +k8s:openapi-gen=true
-type DashboardspecThresholdsConfig struct {
-	Mode  DashboardspecThresholdsMode `json:"mode"`
-	Steps []DashboardspecThreshold    `json:"steps"`
+type DashboardThresholdsConfig struct {
+	Mode  DashboardThresholdsMode `json:"mode"`
+	Steps []DashboardThreshold    `json:"steps"`
 }
 
-// NewDashboardspecThresholdsConfig creates a new DashboardspecThresholdsConfig object.
-func NewDashboardspecThresholdsConfig() *DashboardspecThresholdsConfig {
-	return &DashboardspecThresholdsConfig{}
+// NewDashboardThresholdsConfig creates a new DashboardThresholdsConfig object.
+func NewDashboardThresholdsConfig() *DashboardThresholdsConfig {
+	return &DashboardThresholdsConfig{}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecThresholdsMode string
+type DashboardThresholdsMode string
 
 const (
-	DashboardSpecThresholdsModeAbsolute   DashboardspecThresholdsMode = "absolute"
-	DashboardSpecThresholdsModePercentage DashboardspecThresholdsMode = "percentage"
+	DashboardThresholdsModeAbsolute   DashboardThresholdsMode = "absolute"
+	DashboardThresholdsModePercentage DashboardThresholdsMode = "percentage"
 )
 
 // +k8s:openapi-gen=true
-type DashboardspecThreshold struct {
+type DashboardThreshold struct {
 	Value float64 `json:"value"`
 	Color string  `json:"color"`
 }
 
-// NewDashboardspecThreshold creates a new DashboardspecThreshold object.
-func NewDashboardspecThreshold() *DashboardspecThreshold {
-	return &DashboardspecThreshold{}
+// NewDashboardThreshold creates a new DashboardThreshold object.
+func NewDashboardThreshold() *DashboardThreshold {
+	return &DashboardThreshold{}
 }
 
 // Map a field to a color.
 // +k8s:openapi-gen=true
-type DashboardspecFieldColor struct {
+type DashboardFieldColor struct {
 	// The main color scheme mode.
-	Mode DashboardspecFieldColorModeId `json:"mode"`
+	Mode DashboardFieldColorModeId `json:"mode"`
 	// The fixed color value for fixed or shades color modes.
 	FixedColor *string `json:"fixedColor,omitempty"`
 	// Some visualizations need to know how to assign a series color from by value color schemes.
-	SeriesBy *DashboardspecFieldColorSeriesByMode `json:"seriesBy,omitempty"`
+	SeriesBy *DashboardFieldColorSeriesByMode `json:"seriesBy,omitempty"`
 }
 
-// NewDashboardspecFieldColor creates a new DashboardspecFieldColor object.
-func NewDashboardspecFieldColor() *DashboardspecFieldColor {
-	return &DashboardspecFieldColor{}
+// NewDashboardFieldColor creates a new DashboardFieldColor object.
+func NewDashboardFieldColor() *DashboardFieldColor {
+	return &DashboardFieldColor{}
 }
 
 // Color mode for a field. You can specify a single color, or select a continuous (gradient) color schemes, based on a value.
@@ -1095,76 +1105,76 @@ func NewDashboardspecFieldColor() *DashboardspecFieldColor {
 // `shades`: Shades of a single color. Specify a single color, useful in an override rule.
 // `fixed`: Fixed color mode. Specify a single color, useful in an override rule.
 // +k8s:openapi-gen=true
-type DashboardspecFieldColorModeId string
+type DashboardFieldColorModeId string
 
 const (
-	DashboardSpecFieldColorModeIdThresholds           DashboardspecFieldColorModeId = "thresholds"
-	DashboardSpecFieldColorModeIdPaletteClassic       DashboardspecFieldColorModeId = "palette-classic"
-	DashboardSpecFieldColorModeIdPaletteClassicByName DashboardspecFieldColorModeId = "palette-classic-by-name"
-	DashboardSpecFieldColorModeIdContinuousGrYlRd     DashboardspecFieldColorModeId = "continuous-GrYlRd"
-	DashboardSpecFieldColorModeIdContinuousRdYlGr     DashboardspecFieldColorModeId = "continuous-RdYlGr"
-	DashboardSpecFieldColorModeIdContinuousBlYlRd     DashboardspecFieldColorModeId = "continuous-BlYlRd"
-	DashboardSpecFieldColorModeIdContinuousYlRd       DashboardspecFieldColorModeId = "continuous-YlRd"
-	DashboardSpecFieldColorModeIdContinuousBlPu       DashboardspecFieldColorModeId = "continuous-BlPu"
-	DashboardSpecFieldColorModeIdContinuousYlBl       DashboardspecFieldColorModeId = "continuous-YlBl"
-	DashboardSpecFieldColorModeIdContinuousBlues      DashboardspecFieldColorModeId = "continuous-blues"
-	DashboardSpecFieldColorModeIdContinuousReds       DashboardspecFieldColorModeId = "continuous-reds"
-	DashboardSpecFieldColorModeIdContinuousGreens     DashboardspecFieldColorModeId = "continuous-greens"
-	DashboardSpecFieldColorModeIdContinuousPurples    DashboardspecFieldColorModeId = "continuous-purples"
-	DashboardSpecFieldColorModeIdFixed                DashboardspecFieldColorModeId = "fixed"
-	DashboardSpecFieldColorModeIdShades               DashboardspecFieldColorModeId = "shades"
+	DashboardFieldColorModeIdThresholds           DashboardFieldColorModeId = "thresholds"
+	DashboardFieldColorModeIdPaletteClassic       DashboardFieldColorModeId = "palette-classic"
+	DashboardFieldColorModeIdPaletteClassicByName DashboardFieldColorModeId = "palette-classic-by-name"
+	DashboardFieldColorModeIdContinuousGrYlRd     DashboardFieldColorModeId = "continuous-GrYlRd"
+	DashboardFieldColorModeIdContinuousRdYlGr     DashboardFieldColorModeId = "continuous-RdYlGr"
+	DashboardFieldColorModeIdContinuousBlYlRd     DashboardFieldColorModeId = "continuous-BlYlRd"
+	DashboardFieldColorModeIdContinuousYlRd       DashboardFieldColorModeId = "continuous-YlRd"
+	DashboardFieldColorModeIdContinuousBlPu       DashboardFieldColorModeId = "continuous-BlPu"
+	DashboardFieldColorModeIdContinuousYlBl       DashboardFieldColorModeId = "continuous-YlBl"
+	DashboardFieldColorModeIdContinuousBlues      DashboardFieldColorModeId = "continuous-blues"
+	DashboardFieldColorModeIdContinuousReds       DashboardFieldColorModeId = "continuous-reds"
+	DashboardFieldColorModeIdContinuousGreens     DashboardFieldColorModeId = "continuous-greens"
+	DashboardFieldColorModeIdContinuousPurples    DashboardFieldColorModeId = "continuous-purples"
+	DashboardFieldColorModeIdFixed                DashboardFieldColorModeId = "fixed"
+	DashboardFieldColorModeIdShades               DashboardFieldColorModeId = "shades"
 )
 
 // Defines how to assign a series color from "by value" color schemes. For example for an aggregated data points like a timeseries, the color can be assigned by the min, max or last value.
 // +k8s:openapi-gen=true
-type DashboardspecFieldColorSeriesByMode string
+type DashboardFieldColorSeriesByMode string
 
 const (
-	DashboardSpecFieldColorSeriesByModeMin  DashboardspecFieldColorSeriesByMode = "min"
-	DashboardSpecFieldColorSeriesByModeMax  DashboardspecFieldColorSeriesByMode = "max"
-	DashboardSpecFieldColorSeriesByModeLast DashboardspecFieldColorSeriesByMode = "last"
+	DashboardFieldColorSeriesByModeMin  DashboardFieldColorSeriesByMode = "min"
+	DashboardFieldColorSeriesByModeMax  DashboardFieldColorSeriesByMode = "max"
+	DashboardFieldColorSeriesByModeLast DashboardFieldColorSeriesByMode = "last"
 )
 
 // +k8s:openapi-gen=true
-type DashboardspecDynamicConfigValue struct {
+type DashboardDynamicConfigValue struct {
 	Id    string      `json:"id"`
 	Value interface{} `json:"value,omitempty"`
 }
 
-// NewDashboardspecDynamicConfigValue creates a new DashboardspecDynamicConfigValue object.
-func NewDashboardspecDynamicConfigValue() *DashboardspecDynamicConfigValue {
-	return &DashboardspecDynamicConfigValue{
+// NewDashboardDynamicConfigValue creates a new DashboardDynamicConfigValue object.
+func NewDashboardDynamicConfigValue() *DashboardDynamicConfigValue {
+	return &DashboardDynamicConfigValue{
 		Id: "",
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecLibraryPanelKind struct {
-	Kind string                        `json:"kind"`
-	Spec DashboardspecLibraryPanelSpec `json:"spec"`
+type DashboardLibraryPanelKind struct {
+	Kind string                    `json:"kind"`
+	Spec DashboardLibraryPanelSpec `json:"spec"`
 }
 
-// NewDashboardspecLibraryPanelKind creates a new DashboardspecLibraryPanelKind object.
-func NewDashboardspecLibraryPanelKind() *DashboardspecLibraryPanelKind {
-	return &DashboardspecLibraryPanelKind{
+// NewDashboardLibraryPanelKind creates a new DashboardLibraryPanelKind object.
+func NewDashboardLibraryPanelKind() *DashboardLibraryPanelKind {
+	return &DashboardLibraryPanelKind{
 		Kind: "LibraryPanel",
-		Spec: *NewDashboardspecLibraryPanelSpec(),
+		Spec: *NewDashboardLibraryPanelSpec(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecLibraryPanelSpec struct {
+type DashboardLibraryPanelSpec struct {
 	// Panel ID for the library panel in the dashboard
 	Id float64 `json:"id"`
 	// Title for the library panel in the dashboard
-	Title        string                       `json:"title"`
-	LibraryPanel DashboardspecLibraryPanelRef `json:"libraryPanel"`
+	Title        string                   `json:"title"`
+	LibraryPanel DashboardLibraryPanelRef `json:"libraryPanel"`
 }
 
-// NewDashboardspecLibraryPanelSpec creates a new DashboardspecLibraryPanelSpec object.
-func NewDashboardspecLibraryPanelSpec() *DashboardspecLibraryPanelSpec {
-	return &DashboardspecLibraryPanelSpec{
-		LibraryPanel: *NewDashboardspecLibraryPanelRef(),
+// NewDashboardLibraryPanelSpec creates a new DashboardLibraryPanelSpec object.
+func NewDashboardLibraryPanelSpec() *DashboardLibraryPanelSpec {
+	return &DashboardLibraryPanelSpec{
+		LibraryPanel: *NewDashboardLibraryPanelRef(),
 	}
 }
 
@@ -1172,318 +1182,190 @@ func NewDashboardspecLibraryPanelSpec() *DashboardspecLibraryPanelSpec {
 // When you make a change to a library panel, that change propagates to all instances of where the panel is used.
 // Library panels streamline reuse of panels across multiple dashboards.
 // +k8s:openapi-gen=true
-type DashboardspecLibraryPanelRef struct {
+type DashboardLibraryPanelRef struct {
 	// Library panel name
 	Name string `json:"name"`
 	// Library panel uid
 	Uid string `json:"uid"`
 }
 
-// NewDashboardspecLibraryPanelRef creates a new DashboardspecLibraryPanelRef object.
-func NewDashboardspecLibraryPanelRef() *DashboardspecLibraryPanelRef {
-	return &DashboardspecLibraryPanelRef{}
+// NewDashboardLibraryPanelRef creates a new DashboardLibraryPanelRef object.
+func NewDashboardLibraryPanelRef() *DashboardLibraryPanelRef {
+	return &DashboardLibraryPanelRef{}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecAnnotationQueryKind struct {
-	Kind string                           `json:"kind"`
-	Spec DashboardspecAnnotationQuerySpec `json:"spec"`
+type DashboardAnnotationQueryKind struct {
+	Kind string                       `json:"kind"`
+	Spec DashboardAnnotationQuerySpec `json:"spec"`
 }
 
-// NewDashboardspecAnnotationQueryKind creates a new DashboardspecAnnotationQueryKind object.
-func NewDashboardspecAnnotationQueryKind() *DashboardspecAnnotationQueryKind {
-	return &DashboardspecAnnotationQueryKind{
+// NewDashboardAnnotationQueryKind creates a new DashboardAnnotationQueryKind object.
+func NewDashboardAnnotationQueryKind() *DashboardAnnotationQueryKind {
+	return &DashboardAnnotationQueryKind{
 		Kind: "AnnotationQuery",
-		Spec: *NewDashboardspecAnnotationQuerySpec(),
+		Spec: *NewDashboardAnnotationQuerySpec(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecAnnotationQuerySpec struct {
-	Datasource *DashboardspecDataSourceRef         `json:"datasource,omitempty"`
-	Query      *DashboardspecDataQueryKind         `json:"query,omitempty"`
-	Enable     bool                                `json:"enable"`
-	Hide       bool                                `json:"hide"`
-	IconColor  string                              `json:"iconColor"`
-	Name       string                              `json:"name"`
-	BuiltIn    *bool                               `json:"builtIn,omitempty"`
-	Filter     *DashboardspecAnnotationPanelFilter `json:"filter,omitempty"`
+type DashboardAnnotationQuerySpec struct {
+	Datasource *DashboardDataSourceRef         `json:"datasource,omitempty"`
+	Query      *DashboardDataQueryKind         `json:"query,omitempty"`
+	Enable     bool                            `json:"enable"`
+	Hide       bool                            `json:"hide"`
+	IconColor  string                          `json:"iconColor"`
+	Name       string                          `json:"name"`
+	BuiltIn    *bool                           `json:"builtIn,omitempty"`
+	Filter     *DashboardAnnotationPanelFilter `json:"filter,omitempty"`
 }
 
-// NewDashboardspecAnnotationQuerySpec creates a new DashboardspecAnnotationQuerySpec object.
-func NewDashboardspecAnnotationQuerySpec() *DashboardspecAnnotationQuerySpec {
-	return &DashboardspecAnnotationQuerySpec{
+// NewDashboardAnnotationQuerySpec creates a new DashboardAnnotationQuerySpec object.
+func NewDashboardAnnotationQuerySpec() *DashboardAnnotationQuerySpec {
+	return &DashboardAnnotationQuerySpec{
 		BuiltIn: (func(input bool) *bool { return &input })(false),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecAnnotationPanelFilter struct {
+type DashboardAnnotationPanelFilter struct {
 	// Should the specified panels be included or excluded
 	Exclude *bool `json:"exclude,omitempty"`
 	// Panel IDs that should be included or excluded
 	Ids []uint8 `json:"ids"`
 }
 
-// NewDashboardspecAnnotationPanelFilter creates a new DashboardspecAnnotationPanelFilter object.
-func NewDashboardspecAnnotationPanelFilter() *DashboardspecAnnotationPanelFilter {
-	return &DashboardspecAnnotationPanelFilter{
+// NewDashboardAnnotationPanelFilter creates a new DashboardAnnotationPanelFilter object.
+func NewDashboardAnnotationPanelFilter() *DashboardAnnotationPanelFilter {
+	return &DashboardAnnotationPanelFilter{
 		Exclude: (func(input bool) *bool { return &input })(false),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecGridLayoutKind struct {
-	Kind string                      `json:"kind"`
-	Spec DashboardspecGridLayoutSpec `json:"spec"`
+type DashboardGridLayoutKind struct {
+	Kind string                  `json:"kind"`
+	Spec DashboardGridLayoutSpec `json:"spec"`
 }
 
-// NewDashboardspecGridLayoutKind creates a new DashboardspecGridLayoutKind object.
-func NewDashboardspecGridLayoutKind() *DashboardspecGridLayoutKind {
-	return &DashboardspecGridLayoutKind{
+// NewDashboardGridLayoutKind creates a new DashboardGridLayoutKind object.
+func NewDashboardGridLayoutKind() *DashboardGridLayoutKind {
+	return &DashboardGridLayoutKind{
 		Kind: "GridLayout",
-		Spec: *NewDashboardspecGridLayoutSpec(),
+		Spec: *NewDashboardGridLayoutSpec(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecGridLayoutSpec struct {
-	Items []DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind `json:"items"`
+type DashboardGridLayoutSpec struct {
+	Items []DashboardGridLayoutItemKindOrGridLayoutRowKind `json:"items"`
 }
 
-// NewDashboardspecGridLayoutSpec creates a new DashboardspecGridLayoutSpec object.
-func NewDashboardspecGridLayoutSpec() *DashboardspecGridLayoutSpec {
-	return &DashboardspecGridLayoutSpec{}
+// NewDashboardGridLayoutSpec creates a new DashboardGridLayoutSpec object.
+func NewDashboardGridLayoutSpec() *DashboardGridLayoutSpec {
+	return &DashboardGridLayoutSpec{}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecGridLayoutItemKind struct {
-	Kind string                          `json:"kind"`
-	Spec DashboardspecGridLayoutItemSpec `json:"spec"`
+type DashboardGridLayoutItemKind struct {
+	Kind string                      `json:"kind"`
+	Spec DashboardGridLayoutItemSpec `json:"spec"`
 }
 
-// NewDashboardspecGridLayoutItemKind creates a new DashboardspecGridLayoutItemKind object.
-func NewDashboardspecGridLayoutItemKind() *DashboardspecGridLayoutItemKind {
-	return &DashboardspecGridLayoutItemKind{
+// NewDashboardGridLayoutItemKind creates a new DashboardGridLayoutItemKind object.
+func NewDashboardGridLayoutItemKind() *DashboardGridLayoutItemKind {
+	return &DashboardGridLayoutItemKind{
 		Kind: "GridLayoutItem",
-		Spec: *NewDashboardspecGridLayoutItemSpec(),
+		Spec: *NewDashboardGridLayoutItemSpec(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecGridLayoutItemSpec struct {
+type DashboardGridLayoutItemSpec struct {
 	X      int64 `json:"x"`
 	Y      int64 `json:"y"`
 	Width  int64 `json:"width"`
 	Height int64 `json:"height"`
 	// reference to a PanelKind from dashboard.spec.elements Expressed as JSON Schema reference
-	Element DashboardspecElementReference `json:"element"`
-	Repeat  *DashboardspecRepeatOptions   `json:"repeat,omitempty"`
+	Element DashboardElementReference `json:"element"`
+	Repeat  *DashboardRepeatOptions   `json:"repeat,omitempty"`
 }
 
-// NewDashboardspecGridLayoutItemSpec creates a new DashboardspecGridLayoutItemSpec object.
-func NewDashboardspecGridLayoutItemSpec() *DashboardspecGridLayoutItemSpec {
-	return &DashboardspecGridLayoutItemSpec{
-		Element: *NewDashboardspecElementReference(),
+// NewDashboardGridLayoutItemSpec creates a new DashboardGridLayoutItemSpec object.
+func NewDashboardGridLayoutItemSpec() *DashboardGridLayoutItemSpec {
+	return &DashboardGridLayoutItemSpec{
+		Element: *NewDashboardElementReference(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecElementReference struct {
+type DashboardElementReference struct {
 	Kind string `json:"kind"`
 	Name string `json:"name"`
 }
 
-// NewDashboardspecElementReference creates a new DashboardspecElementReference object.
-func NewDashboardspecElementReference() *DashboardspecElementReference {
-	return &DashboardspecElementReference{
+// NewDashboardElementReference creates a new DashboardElementReference object.
+func NewDashboardElementReference() *DashboardElementReference {
+	return &DashboardElementReference{
 		Kind: "ElementReference",
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecRepeatOptions struct {
-	Mode      string                               `json:"mode"`
-	Value     string                               `json:"value"`
-	Direction *DashboardSpecRepeatOptionsDirection `json:"direction,omitempty"`
-	MaxPerRow *int64                               `json:"maxPerRow,omitempty"`
+type DashboardRepeatOptions struct {
+	Mode      string                           `json:"mode"`
+	Value     string                           `json:"value"`
+	Direction *DashboardRepeatOptionsDirection `json:"direction,omitempty"`
+	MaxPerRow *int64                           `json:"maxPerRow,omitempty"`
 }
 
-// NewDashboardspecRepeatOptions creates a new DashboardspecRepeatOptions object.
-func NewDashboardspecRepeatOptions() *DashboardspecRepeatOptions {
-	return &DashboardspecRepeatOptions{}
+// NewDashboardRepeatOptions creates a new DashboardRepeatOptions object.
+func NewDashboardRepeatOptions() *DashboardRepeatOptions {
+	return &DashboardRepeatOptions{}
 }
 
 // other repeat modes will be added in the future: label, frame
 // +k8s:openapi-gen=true
-const DashboardspecRepeatMode = "variable"
+const DashboardRepeatMode = "variable"
 
 // +k8s:openapi-gen=true
-type DashboardspecGridLayoutRowKind struct {
-	Kind string                         `json:"kind"`
-	Spec DashboardspecGridLayoutRowSpec `json:"spec"`
+type DashboardGridLayoutRowKind struct {
+	Kind string                     `json:"kind"`
+	Spec DashboardGridLayoutRowSpec `json:"spec"`
 }
 
-// NewDashboardspecGridLayoutRowKind creates a new DashboardspecGridLayoutRowKind object.
-func NewDashboardspecGridLayoutRowKind() *DashboardspecGridLayoutRowKind {
-	return &DashboardspecGridLayoutRowKind{
+// NewDashboardGridLayoutRowKind creates a new DashboardGridLayoutRowKind object.
+func NewDashboardGridLayoutRowKind() *DashboardGridLayoutRowKind {
+	return &DashboardGridLayoutRowKind{
 		Kind: "GridLayoutRow",
-		Spec: *NewDashboardspecGridLayoutRowSpec(),
+		Spec: *NewDashboardGridLayoutRowSpec(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecGridLayoutRowSpec struct {
+type DashboardGridLayoutRowSpec struct {
 	Y         int64  `json:"y"`
 	Collapsed bool   `json:"collapsed"`
 	Title     string `json:"title"`
 	// Grid items in the row will have their Y value be relative to the rows Y value. This means a panel positioned at Y: 0 in a row with Y: 10 will be positioned at Y: 11 (row header has a heigh of 1) in the dashboard.
-	Elements []DashboardspecGridLayoutItemKind `json:"elements"`
-	Repeat   *DashboardspecRowRepeatOptions    `json:"repeat,omitempty"`
+	Elements []DashboardGridLayoutItemKind `json:"elements"`
+	Repeat   *DashboardRowRepeatOptions    `json:"repeat,omitempty"`
 }
 
-// NewDashboardspecGridLayoutRowSpec creates a new DashboardspecGridLayoutRowSpec object.
-func NewDashboardspecGridLayoutRowSpec() *DashboardspecGridLayoutRowSpec {
-	return &DashboardspecGridLayoutRowSpec{}
+// NewDashboardGridLayoutRowSpec creates a new DashboardGridLayoutRowSpec object.
+func NewDashboardGridLayoutRowSpec() *DashboardGridLayoutRowSpec {
+	return &DashboardGridLayoutRowSpec{}
 }
 
 // +k8s:openapi-gen=true
-type DashboardspecRowRepeatOptions struct {
+type DashboardRowRepeatOptions struct {
 	Mode  string `json:"mode"`
 	Value string `json:"value"`
 }
 
-// NewDashboardspecRowRepeatOptions creates a new DashboardspecRowRepeatOptions object.
-func NewDashboardspecRowRepeatOptions() *DashboardspecRowRepeatOptions {
-	return &DashboardspecRowRepeatOptions{}
-}
-
-// Supported value mapping types
-// `value`: Maps text values to a color or different display text and color. For example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.
-// `range`: Maps numerical ranges to a display text and color. For example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.
-// `regex`: Maps regular expressions to replacement text and a color. For example, if a value is www.example.com, you can configure a regex value mapping so that Grafana displays www and truncates the domain.
-// `special`: Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color. See SpecialValueMatch to see the list of special values. For example, you can configure a special value mapping so that null values appear as N/A.
-// +k8s:openapi-gen=true
-type DashboardspecMappingType string
-
-const (
-	DashboardSpecMappingTypeValueToText  DashboardspecMappingType = "value"
-	DashboardSpecMappingTypeRangeToText  DashboardspecMappingType = "range"
-	DashboardSpecMappingTypeRegexToText  DashboardspecMappingType = "regex"
-	DashboardSpecMappingTypeSpecialValue DashboardspecMappingType = "special"
-)
-
-// --- Common types ---
-// +k8s:openapi-gen=true
-type DashboardspecKind struct {
-	Kind     string      `json:"kind"`
-	Spec     interface{} `json:"spec"`
-	Metadata interface{} `json:"metadata,omitempty"`
-}
-
-// NewDashboardspecKind creates a new DashboardspecKind object.
-func NewDashboardspecKind() *DashboardspecKind {
-	return &DashboardspecKind{}
-}
-
-// Variable types
-// +k8s:openapi-gen=true
-type DashboardspecVariableValue = DashboardStringOrBoolOrFloat64OrSpecCustomVariableValueOrArrayOfSpecVariableValueSingle
-
-// NewDashboardspecVariableValue creates a new DashboardspecVariableValue object.
-func NewDashboardspecVariableValue() *DashboardspecVariableValue {
-	return NewDashboardStringOrBoolOrFloat64OrSpecCustomVariableValueOrArrayOfSpecVariableValueSingle()
-}
-
-// +k8s:openapi-gen=true
-type DashboardspecVariableValueSingle = DashboardStringOrBoolOrFloat64OrSpecCustomVariableValue
-
-// NewDashboardspecVariableValueSingle creates a new DashboardspecVariableValueSingle object.
-func NewDashboardspecVariableValueSingle() *DashboardspecVariableValueSingle {
-	return NewDashboardStringOrBoolOrFloat64OrSpecCustomVariableValue()
-}
-
-// Custom variable value
-// +k8s:openapi-gen=true
-type DashboardspecCustomVariableValue struct {
-	// The format name or function used in the expression
-	Formatter DashboardStringOrSpecVariableCustomFormatterFn `json:"formatter"`
-}
-
-// NewDashboardspecCustomVariableValue creates a new DashboardspecCustomVariableValue object.
-func NewDashboardspecCustomVariableValue() *DashboardspecCustomVariableValue {
-	return &DashboardspecCustomVariableValue{
-		Formatter: *NewDashboardStringOrSpecVariableCustomFormatterFn(),
-	}
-}
-
-// Custom formatter function
-// +k8s:openapi-gen=true
-type DashboardspecVariableCustomFormatterFn struct {
-	Value                  interface{}                                                       `json:"value"`
-	LegacyVariableModel    DashboardV2alpha1SpecVariableCustomFormatterFnLegacyVariableModel `json:"legacyVariableModel"`
-	LegacyDefaultFormatter *DashboardspecVariableCustomFormatterFn                           `json:"legacyDefaultFormatter,omitempty"`
-}
-
-// NewDashboardspecVariableCustomFormatterFn creates a new DashboardspecVariableCustomFormatterFn object.
-func NewDashboardspecVariableCustomFormatterFn() *DashboardspecVariableCustomFormatterFn {
-	return &DashboardspecVariableCustomFormatterFn{
-		LegacyVariableModel: *NewDashboardV2alpha1SpecVariableCustomFormatterFnLegacyVariableModel(),
-	}
-}
-
-// Dashboard variable type
-// `query`: Query-generated list of values such as metric names, server names, sensor IDs, data centers, and so on.
-// `adhoc`: Key/value filters that are automatically added to all metric queries for a data source (Prometheus, Loki, InfluxDB, and Elasticsearch only).
-// `constant`: 	Define a hidden constant.
-// `datasource`: Quickly change the data source for an entire dashboard.
-// `interval`: Interval variables represent time spans.
-// `textbox`: Display a free text input field with an optional default value.
-// `custom`: Define the variable options manually using a comma-separated list.
-// `system`: Variables defined by Grafana. See: https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/#global-variables
-// +k8s:openapi-gen=true
-type DashboardspecVariableType string
-
-const (
-	DashboardSpecVariableTypeQuery      DashboardspecVariableType = "query"
-	DashboardSpecVariableTypeAdhoc      DashboardspecVariableType = "adhoc"
-	DashboardSpecVariableTypeGroupby    DashboardspecVariableType = "groupby"
-	DashboardSpecVariableTypeConstant   DashboardspecVariableType = "constant"
-	DashboardSpecVariableTypeDatasource DashboardspecVariableType = "datasource"
-	DashboardSpecVariableTypeInterval   DashboardspecVariableType = "interval"
-	DashboardSpecVariableTypeTextbox    DashboardspecVariableType = "textbox"
-	DashboardSpecVariableTypeCustom     DashboardspecVariableType = "custom"
-	DashboardSpecVariableTypeSystem     DashboardspecVariableType = "system"
-	DashboardSpecVariableTypeSnapshot   DashboardspecVariableType = "snapshot"
-)
-
-// Custom formatter variable
-// +k8s:openapi-gen=true
-type DashboardspecCustomFormatterVariable struct {
-	Name       string                    `json:"name"`
-	Type       DashboardspecVariableType `json:"type"`
-	Multi      bool                      `json:"multi"`
-	IncludeAll bool                      `json:"includeAll"`
-}
-
-// NewDashboardspecCustomFormatterVariable creates a new DashboardspecCustomFormatterVariable object.
-func NewDashboardspecCustomFormatterVariable() *DashboardspecCustomFormatterVariable {
-	return &DashboardspecCustomFormatterVariable{}
-}
-
-// FIXME: should we introduce this? --- Variable value option
-// +k8s:openapi-gen=true
-type DashboardspecVariableValueOption struct {
-	Label string                           `json:"label"`
-	Value DashboardspecVariableValueSingle `json:"value"`
-	Group *string                          `json:"group,omitempty"`
-}
-
-// NewDashboardspecVariableValueOption creates a new DashboardspecVariableValueOption object.
-func NewDashboardspecVariableValueOption() *DashboardspecVariableValueOption {
-	return &DashboardspecVariableValueOption{
-		Value: *NewDashboardspecVariableValueSingle(),
-	}
+// NewDashboardRowRepeatOptions creates a new DashboardRowRepeatOptions object.
+func NewDashboardRowRepeatOptions() *DashboardRowRepeatOptions {
+	return &DashboardRowRepeatOptions{}
 }
 
 // +k8s:openapi-gen=true
@@ -1496,7 +1378,7 @@ type DashboardSpec struct {
 	// "Off" for no shared crosshair or tooltip (default).
 	// "Crosshair" for shared crosshair.
 	// "Tooltip" for shared crosshair AND shared tooltip.
-	CursorSync DashboardspecDashboardCursorSync `json:"cursorSync"`
+	CursorSync DashboardDashboardCursorSync `json:"cursorSync"`
 	// When set to true, the dashboard will redraw panels at an interval matching the pixel width.
 	// This will keep data "moving left" regardless of the query refresh rate. This setting helps
 	// avoid dashboards presenting stale live data.
@@ -1506,15 +1388,15 @@ type DashboardSpec struct {
 	// Whether a dashboard is editable or not.
 	Editable *bool `json:"editable,omitempty"`
 	// Links with references to other dashboards or external websites.
-	Links []DashboardspecDashboardLink `json:"links"`
+	Links []DashboardDashboardLink `json:"links"`
 	// Tags associated with dashboard.
-	Tags         []string                      `json:"tags"`
-	TimeSettings DashboardspecTimeSettingsSpec `json:"timeSettings"`
+	Tags         []string                  `json:"tags"`
+	TimeSettings DashboardTimeSettingsSpec `json:"timeSettings"`
 	// Configured template variables.
-	Variables   []DashboardspecVariableKind        `json:"variables"`
-	Elements    map[string]DashboardspecElement    `json:"elements"`
-	Annotations []DashboardspecAnnotationQueryKind `json:"annotations"`
-	Layout      DashboardspecGridLayoutKind        `json:"layout"`
+	Variables   []DashboardVariableKind        `json:"variables"`
+	Elements    map[string]DashboardElement    `json:"elements"`
+	Annotations []DashboardAnnotationQueryKind `json:"annotations"`
+	Layout      DashboardGridLayoutKind        `json:"layout"`
 	// Plugins only. The version of the dashboard installed together with the plugin.
 	// This is used to determine if the dashboard should be updated when the plugin is updated.
 	Revision *uint16 `json:"revision,omitempty"`
@@ -1524,141 +1406,128 @@ type DashboardSpec struct {
 func NewDashboardSpec() *DashboardSpec {
 	return &DashboardSpec{
 		Editable:     (func(input bool) *bool { return &input })(true),
-		TimeSettings: *NewDashboardspecTimeSettingsSpec(),
-		Layout:       *NewDashboardspecGridLayoutKind(),
+		TimeSettings: *NewDashboardTimeSettingsSpec(),
+		Layout:       *NewDashboardGridLayoutKind(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardSpecRepeatOptionsDirection string
+type DashboardRepeatOptionsDirection string
 
 const (
-	DashboardSpecRepeatOptionsDirectionH DashboardSpecRepeatOptionsDirection = "h"
-	DashboardSpecRepeatOptionsDirectionV DashboardSpecRepeatOptionsDirection = "v"
+	DashboardRepeatOptionsDirectionH DashboardRepeatOptionsDirection = "h"
+	DashboardRepeatOptionsDirectionV DashboardRepeatOptionsDirection = "v"
 )
 
 // +k8s:openapi-gen=true
-type DashboardV2alpha1SpecFieldConfigSourceOverrides struct {
-	Matcher    DashboardspecMatcherConfig        `json:"matcher"`
-	Properties []DashboardspecDynamicConfigValue `json:"properties"`
+type DashboardV2alpha1FieldConfigSourceOverrides struct {
+	Matcher    DashboardMatcherConfig        `json:"matcher"`
+	Properties []DashboardDynamicConfigValue `json:"properties"`
 }
 
-// NewDashboardV2alpha1SpecFieldConfigSourceOverrides creates a new DashboardV2alpha1SpecFieldConfigSourceOverrides object.
-func NewDashboardV2alpha1SpecFieldConfigSourceOverrides() *DashboardV2alpha1SpecFieldConfigSourceOverrides {
-	return &DashboardV2alpha1SpecFieldConfigSourceOverrides{
-		Matcher: *NewDashboardspecMatcherConfig(),
+// NewDashboardV2alpha1FieldConfigSourceOverrides creates a new DashboardV2alpha1FieldConfigSourceOverrides object.
+func NewDashboardV2alpha1FieldConfigSourceOverrides() *DashboardV2alpha1FieldConfigSourceOverrides {
+	return &DashboardV2alpha1FieldConfigSourceOverrides{
+		Matcher: *NewDashboardMatcherConfig(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardV2alpha1SpecRangeMapOptions struct {
+type DashboardV2alpha1RangeMapOptions struct {
 	// Min value of the range. It can be null which means -Infinity
 	From *float64 `json:"from"`
 	// Max value of the range. It can be null which means +Infinity
 	To *float64 `json:"to"`
 	// Config to apply when the value is within the range
-	Result DashboardspecValueMappingResult `json:"result"`
+	Result DashboardValueMappingResult `json:"result"`
 }
 
-// NewDashboardV2alpha1SpecRangeMapOptions creates a new DashboardV2alpha1SpecRangeMapOptions object.
-func NewDashboardV2alpha1SpecRangeMapOptions() *DashboardV2alpha1SpecRangeMapOptions {
-	return &DashboardV2alpha1SpecRangeMapOptions{
-		Result: *NewDashboardspecValueMappingResult(),
+// NewDashboardV2alpha1RangeMapOptions creates a new DashboardV2alpha1RangeMapOptions object.
+func NewDashboardV2alpha1RangeMapOptions() *DashboardV2alpha1RangeMapOptions {
+	return &DashboardV2alpha1RangeMapOptions{
+		Result: *NewDashboardValueMappingResult(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardV2alpha1SpecRegexMapOptions struct {
+type DashboardV2alpha1RegexMapOptions struct {
 	// Regular expression to match against
 	Pattern string `json:"pattern"`
 	// Config to apply when the value matches the regex
-	Result DashboardspecValueMappingResult `json:"result"`
+	Result DashboardValueMappingResult `json:"result"`
 }
 
-// NewDashboardV2alpha1SpecRegexMapOptions creates a new DashboardV2alpha1SpecRegexMapOptions object.
-func NewDashboardV2alpha1SpecRegexMapOptions() *DashboardV2alpha1SpecRegexMapOptions {
-	return &DashboardV2alpha1SpecRegexMapOptions{
-		Result: *NewDashboardspecValueMappingResult(),
+// NewDashboardV2alpha1RegexMapOptions creates a new DashboardV2alpha1RegexMapOptions object.
+func NewDashboardV2alpha1RegexMapOptions() *DashboardV2alpha1RegexMapOptions {
+	return &DashboardV2alpha1RegexMapOptions{
+		Result: *NewDashboardValueMappingResult(),
 	}
 }
 
 // +k8s:openapi-gen=true
-type DashboardV2alpha1SpecSpecialValueMapOptions struct {
+type DashboardV2alpha1SpecialValueMapOptions struct {
 	// Special value to match against
-	Match DashboardspecSpecialValueMatch `json:"match"`
+	Match DashboardSpecialValueMatch `json:"match"`
 	// Config to apply when the value matches the special value
-	Result DashboardspecValueMappingResult `json:"result"`
+	Result DashboardValueMappingResult `json:"result"`
 }
 
-// NewDashboardV2alpha1SpecSpecialValueMapOptions creates a new DashboardV2alpha1SpecSpecialValueMapOptions object.
-func NewDashboardV2alpha1SpecSpecialValueMapOptions() *DashboardV2alpha1SpecSpecialValueMapOptions {
-	return &DashboardV2alpha1SpecSpecialValueMapOptions{
-		Result: *NewDashboardspecValueMappingResult(),
+// NewDashboardV2alpha1SpecialValueMapOptions creates a new DashboardV2alpha1SpecialValueMapOptions object.
+func NewDashboardV2alpha1SpecialValueMapOptions() *DashboardV2alpha1SpecialValueMapOptions {
+	return &DashboardV2alpha1SpecialValueMapOptions{
+		Result: *NewDashboardValueMappingResult(),
 	}
-}
-
-// +k8s:openapi-gen=true
-type DashboardV2alpha1SpecVariableCustomFormatterFnLegacyVariableModel struct {
-	Name       string                    `json:"name"`
-	Type       DashboardspecVariableType `json:"type"`
-	Multi      bool                      `json:"multi"`
-	IncludeAll bool                      `json:"includeAll"`
-}
-
-// NewDashboardV2alpha1SpecVariableCustomFormatterFnLegacyVariableModel creates a new DashboardV2alpha1SpecVariableCustomFormatterFnLegacyVariableModel object.
-func NewDashboardV2alpha1SpecVariableCustomFormatterFnLegacyVariableModel() *DashboardV2alpha1SpecVariableCustomFormatterFnLegacyVariableModel {
-	return &DashboardV2alpha1SpecVariableCustomFormatterFnLegacyVariableModel{}
 }
 
 // +k8s:openapi-gen=true
-type DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind struct {
-	SpecQueryVariableKind      *DashboardspecQueryVariableKind      `json:"SpecQueryVariableKind,omitempty"`
-	SpecTextVariableKind       *DashboardspecTextVariableKind       `json:"SpecTextVariableKind,omitempty"`
-	SpecConstantVariableKind   *DashboardspecConstantVariableKind   `json:"SpecConstantVariableKind,omitempty"`
-	SpecDatasourceVariableKind *DashboardspecDatasourceVariableKind `json:"SpecDatasourceVariableKind,omitempty"`
-	SpecIntervalVariableKind   *DashboardspecIntervalVariableKind   `json:"SpecIntervalVariableKind,omitempty"`
-	SpecCustomVariableKind     *DashboardspecCustomVariableKind     `json:"SpecCustomVariableKind,omitempty"`
-	SpecGroupByVariableKind    *DashboardspecGroupByVariableKind    `json:"SpecGroupByVariableKind,omitempty"`
-	SpecAdhocVariableKind      *DashboardspecAdhocVariableKind      `json:"SpecAdhocVariableKind,omitempty"`
+type DashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind struct {
+	QueryVariableKind      *DashboardQueryVariableKind      `json:"QueryVariableKind,omitempty"`
+	TextVariableKind       *DashboardTextVariableKind       `json:"TextVariableKind,omitempty"`
+	ConstantVariableKind   *DashboardConstantVariableKind   `json:"ConstantVariableKind,omitempty"`
+	DatasourceVariableKind *DashboardDatasourceVariableKind `json:"DatasourceVariableKind,omitempty"`
+	IntervalVariableKind   *DashboardIntervalVariableKind   `json:"IntervalVariableKind,omitempty"`
+	CustomVariableKind     *DashboardCustomVariableKind     `json:"CustomVariableKind,omitempty"`
+	GroupByVariableKind    *DashboardGroupByVariableKind    `json:"GroupByVariableKind,omitempty"`
+	AdhocVariableKind      *DashboardAdhocVariableKind      `json:"AdhocVariableKind,omitempty"`
 }
 
-// NewDashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind creates a new DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind object.
-func NewDashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind() *DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind {
-	return &DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind{}
+// NewDashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind creates a new DashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind object.
+func NewDashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind() *DashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind {
+	return &DashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind{}
 }
 
-// MarshalJSON implements a custom JSON marshalling logic to encode `DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind` as JSON.
-func (resource DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind) MarshalJSON() ([]byte, error) {
-	if resource.SpecQueryVariableKind != nil {
-		return json.Marshal(resource.SpecQueryVariableKind)
+// MarshalJSON implements a custom JSON marshalling logic to encode `DashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind` as JSON.
+func (resource DashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind) MarshalJSON() ([]byte, error) {
+	if resource.QueryVariableKind != nil {
+		return json.Marshal(resource.QueryVariableKind)
 	}
-	if resource.SpecTextVariableKind != nil {
-		return json.Marshal(resource.SpecTextVariableKind)
+	if resource.TextVariableKind != nil {
+		return json.Marshal(resource.TextVariableKind)
 	}
-	if resource.SpecConstantVariableKind != nil {
-		return json.Marshal(resource.SpecConstantVariableKind)
+	if resource.ConstantVariableKind != nil {
+		return json.Marshal(resource.ConstantVariableKind)
 	}
-	if resource.SpecDatasourceVariableKind != nil {
-		return json.Marshal(resource.SpecDatasourceVariableKind)
+	if resource.DatasourceVariableKind != nil {
+		return json.Marshal(resource.DatasourceVariableKind)
 	}
-	if resource.SpecIntervalVariableKind != nil {
-		return json.Marshal(resource.SpecIntervalVariableKind)
+	if resource.IntervalVariableKind != nil {
+		return json.Marshal(resource.IntervalVariableKind)
 	}
-	if resource.SpecCustomVariableKind != nil {
-		return json.Marshal(resource.SpecCustomVariableKind)
+	if resource.CustomVariableKind != nil {
+		return json.Marshal(resource.CustomVariableKind)
 	}
-	if resource.SpecGroupByVariableKind != nil {
-		return json.Marshal(resource.SpecGroupByVariableKind)
+	if resource.GroupByVariableKind != nil {
+		return json.Marshal(resource.GroupByVariableKind)
 	}
-	if resource.SpecAdhocVariableKind != nil {
-		return json.Marshal(resource.SpecAdhocVariableKind)
+	if resource.AdhocVariableKind != nil {
+		return json.Marshal(resource.AdhocVariableKind)
 	}
 
 	return nil, fmt.Errorf("no value for disjunction of refs")
 }
 
-// UnmarshalJSON implements a custom JSON unmarshalling logic to decode `DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind` from JSON.
-func (resource *DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConstantVariableKindOrSpecDatasourceVariableKindOrSpecIntervalVariableKindOrSpecCustomVariableKindOrSpecGroupByVariableKindOrSpecAdhocVariableKind) UnmarshalJSON(raw []byte) error {
+// UnmarshalJSON implements a custom JSON unmarshalling logic to decode `DashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind` from JSON.
+func (resource *DashboardQueryVariableKindOrTextVariableKindOrConstantVariableKindOrDatasourceVariableKindOrIntervalVariableKindOrCustomVariableKindOrGroupByVariableKindOrAdhocVariableKind) UnmarshalJSON(raw []byte) error {
 	if raw == nil {
 		return nil
 	}
@@ -1676,68 +1545,68 @@ func (resource *DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConsta
 
 	switch discriminator {
 	case "AdhocVariable":
-		var specAdhocVariableKind SpecAdhocVariableKind
-		if err := json.Unmarshal(raw, &specAdhocVariableKind); err != nil {
+		var adhocVariableKind AdhocVariableKind
+		if err := json.Unmarshal(raw, &adhocVariableKind); err != nil {
 			return err
 		}
 
-		resource.SpecAdhocVariableKind = &specAdhocVariableKind
+		resource.AdhocVariableKind = &adhocVariableKind
 		return nil
 	case "ConstantVariable":
-		var specConstantVariableKind SpecConstantVariableKind
-		if err := json.Unmarshal(raw, &specConstantVariableKind); err != nil {
+		var constantVariableKind ConstantVariableKind
+		if err := json.Unmarshal(raw, &constantVariableKind); err != nil {
 			return err
 		}
 
-		resource.SpecConstantVariableKind = &specConstantVariableKind
+		resource.ConstantVariableKind = &constantVariableKind
 		return nil
 	case "CustomVariable":
-		var specCustomVariableKind SpecCustomVariableKind
-		if err := json.Unmarshal(raw, &specCustomVariableKind); err != nil {
+		var customVariableKind CustomVariableKind
+		if err := json.Unmarshal(raw, &customVariableKind); err != nil {
 			return err
 		}
 
-		resource.SpecCustomVariableKind = &specCustomVariableKind
+		resource.CustomVariableKind = &customVariableKind
 		return nil
 	case "DatasourceVariable":
-		var specDatasourceVariableKind SpecDatasourceVariableKind
-		if err := json.Unmarshal(raw, &specDatasourceVariableKind); err != nil {
+		var datasourceVariableKind DatasourceVariableKind
+		if err := json.Unmarshal(raw, &datasourceVariableKind); err != nil {
 			return err
 		}
 
-		resource.SpecDatasourceVariableKind = &specDatasourceVariableKind
+		resource.DatasourceVariableKind = &datasourceVariableKind
 		return nil
 	case "GroupByVariable":
-		var specGroupByVariableKind SpecGroupByVariableKind
-		if err := json.Unmarshal(raw, &specGroupByVariableKind); err != nil {
+		var groupByVariableKind GroupByVariableKind
+		if err := json.Unmarshal(raw, &groupByVariableKind); err != nil {
 			return err
 		}
 
-		resource.SpecGroupByVariableKind = &specGroupByVariableKind
+		resource.GroupByVariableKind = &groupByVariableKind
 		return nil
 	case "IntervalVariable":
-		var specIntervalVariableKind SpecIntervalVariableKind
-		if err := json.Unmarshal(raw, &specIntervalVariableKind); err != nil {
+		var intervalVariableKind IntervalVariableKind
+		if err := json.Unmarshal(raw, &intervalVariableKind); err != nil {
 			return err
 		}
 
-		resource.SpecIntervalVariableKind = &specIntervalVariableKind
+		resource.IntervalVariableKind = &intervalVariableKind
 		return nil
 	case "QueryVariable":
-		var specQueryVariableKind SpecQueryVariableKind
-		if err := json.Unmarshal(raw, &specQueryVariableKind); err != nil {
+		var queryVariableKind QueryVariableKind
+		if err := json.Unmarshal(raw, &queryVariableKind); err != nil {
 			return err
 		}
 
-		resource.SpecQueryVariableKind = &specQueryVariableKind
+		resource.QueryVariableKind = &queryVariableKind
 		return nil
 	case "TextVariable":
-		var specTextVariableKind SpecTextVariableKind
-		if err := json.Unmarshal(raw, &specTextVariableKind); err != nil {
+		var textVariableKind TextVariableKind
+		if err := json.Unmarshal(raw, &textVariableKind); err != nil {
 			return err
 		}
 
-		resource.SpecTextVariableKind = &specTextVariableKind
+		resource.TextVariableKind = &textVariableKind
 		return nil
 	}
 
@@ -1745,14 +1614,14 @@ func (resource *DashboardSpecQueryVariableKindOrSpecTextVariableKindOrSpecConsta
 }
 
 // +k8s:openapi-gen=true
-type DashboardStringOrSpecDataQueryKind struct {
-	String            *string                     `json:"String,omitempty"`
-	SpecDataQueryKind *DashboardspecDataQueryKind `json:"SpecDataQueryKind,omitempty"`
+type DashboardStringOrDataQueryKind struct {
+	String        *string                 `json:"String,omitempty"`
+	DataQueryKind *DashboardDataQueryKind `json:"DataQueryKind,omitempty"`
 }
 
-// NewDashboardStringOrSpecDataQueryKind creates a new DashboardStringOrSpecDataQueryKind object.
-func NewDashboardStringOrSpecDataQueryKind() *DashboardStringOrSpecDataQueryKind {
-	return &DashboardStringOrSpecDataQueryKind{}
+// NewDashboardStringOrDataQueryKind creates a new DashboardStringOrDataQueryKind object.
+func NewDashboardStringOrDataQueryKind() *DashboardStringOrDataQueryKind {
+	return &DashboardStringOrDataQueryKind{}
 }
 
 // +k8s:openapi-gen=true
@@ -1866,30 +1735,30 @@ func (resource *DashboardStringOrFloat64) UnmarshalJSON(raw []byte) error {
 }
 
 // +k8s:openapi-gen=true
-type DashboardSpecPanelKindOrSpecLibraryPanelKind struct {
-	SpecPanelKind        *DashboardspecPanelKind        `json:"SpecPanelKind,omitempty"`
-	SpecLibraryPanelKind *DashboardspecLibraryPanelKind `json:"SpecLibraryPanelKind,omitempty"`
+type DashboardPanelKindOrLibraryPanelKind struct {
+	PanelKind        *DashboardPanelKind        `json:"PanelKind,omitempty"`
+	LibraryPanelKind *DashboardLibraryPanelKind `json:"LibraryPanelKind,omitempty"`
 }
 
-// NewDashboardSpecPanelKindOrSpecLibraryPanelKind creates a new DashboardSpecPanelKindOrSpecLibraryPanelKind object.
-func NewDashboardSpecPanelKindOrSpecLibraryPanelKind() *DashboardSpecPanelKindOrSpecLibraryPanelKind {
-	return &DashboardSpecPanelKindOrSpecLibraryPanelKind{}
+// NewDashboardPanelKindOrLibraryPanelKind creates a new DashboardPanelKindOrLibraryPanelKind object.
+func NewDashboardPanelKindOrLibraryPanelKind() *DashboardPanelKindOrLibraryPanelKind {
+	return &DashboardPanelKindOrLibraryPanelKind{}
 }
 
-// MarshalJSON implements a custom JSON marshalling logic to encode `DashboardSpecPanelKindOrSpecLibraryPanelKind` as JSON.
-func (resource DashboardSpecPanelKindOrSpecLibraryPanelKind) MarshalJSON() ([]byte, error) {
-	if resource.SpecPanelKind != nil {
-		return json.Marshal(resource.SpecPanelKind)
+// MarshalJSON implements a custom JSON marshalling logic to encode `DashboardPanelKindOrLibraryPanelKind` as JSON.
+func (resource DashboardPanelKindOrLibraryPanelKind) MarshalJSON() ([]byte, error) {
+	if resource.PanelKind != nil {
+		return json.Marshal(resource.PanelKind)
 	}
-	if resource.SpecLibraryPanelKind != nil {
-		return json.Marshal(resource.SpecLibraryPanelKind)
+	if resource.LibraryPanelKind != nil {
+		return json.Marshal(resource.LibraryPanelKind)
 	}
 
 	return nil, fmt.Errorf("no value for disjunction of refs")
 }
 
-// UnmarshalJSON implements a custom JSON unmarshalling logic to decode `DashboardSpecPanelKindOrSpecLibraryPanelKind` from JSON.
-func (resource *DashboardSpecPanelKindOrSpecLibraryPanelKind) UnmarshalJSON(raw []byte) error {
+// UnmarshalJSON implements a custom JSON unmarshalling logic to decode `DashboardPanelKindOrLibraryPanelKind` from JSON.
+func (resource *DashboardPanelKindOrLibraryPanelKind) UnmarshalJSON(raw []byte) error {
 	if raw == nil {
 		return nil
 	}
@@ -1907,20 +1776,20 @@ func (resource *DashboardSpecPanelKindOrSpecLibraryPanelKind) UnmarshalJSON(raw 
 
 	switch discriminator {
 	case "LibraryPanel":
-		var specLibraryPanelKind SpecLibraryPanelKind
-		if err := json.Unmarshal(raw, &specLibraryPanelKind); err != nil {
+		var libraryPanelKind LibraryPanelKind
+		if err := json.Unmarshal(raw, &libraryPanelKind); err != nil {
 			return err
 		}
 
-		resource.SpecLibraryPanelKind = &specLibraryPanelKind
+		resource.LibraryPanelKind = &libraryPanelKind
 		return nil
 	case "Panel":
-		var specPanelKind SpecPanelKind
-		if err := json.Unmarshal(raw, &specPanelKind); err != nil {
+		var panelKind PanelKind
+		if err := json.Unmarshal(raw, &panelKind); err != nil {
 			return err
 		}
 
-		resource.SpecPanelKind = &specPanelKind
+		resource.PanelKind = &panelKind
 		return nil
 	}
 
@@ -1928,38 +1797,38 @@ func (resource *DashboardSpecPanelKindOrSpecLibraryPanelKind) UnmarshalJSON(raw 
 }
 
 // +k8s:openapi-gen=true
-type DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap struct {
-	SpecValueMap        *DashboardspecValueMap        `json:"SpecValueMap,omitempty"`
-	SpecRangeMap        *DashboardspecRangeMap        `json:"SpecRangeMap,omitempty"`
-	SpecRegexMap        *DashboardspecRegexMap        `json:"SpecRegexMap,omitempty"`
-	SpecSpecialValueMap *DashboardspecSpecialValueMap `json:"SpecSpecialValueMap,omitempty"`
+type DashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap struct {
+	ValueMap        *DashboardValueMap        `json:"ValueMap,omitempty"`
+	RangeMap        *DashboardRangeMap        `json:"RangeMap,omitempty"`
+	RegexMap        *DashboardRegexMap        `json:"RegexMap,omitempty"`
+	SpecialValueMap *DashboardSpecialValueMap `json:"SpecialValueMap,omitempty"`
 }
 
-// NewDashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap creates a new DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap object.
-func NewDashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap() *DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap {
-	return &DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap{}
+// NewDashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap creates a new DashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap object.
+func NewDashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap() *DashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap {
+	return &DashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap{}
 }
 
-// MarshalJSON implements a custom JSON marshalling logic to encode `DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap` as JSON.
-func (resource DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap) MarshalJSON() ([]byte, error) {
-	if resource.SpecValueMap != nil {
-		return json.Marshal(resource.SpecValueMap)
+// MarshalJSON implements a custom JSON marshalling logic to encode `DashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap` as JSON.
+func (resource DashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap) MarshalJSON() ([]byte, error) {
+	if resource.ValueMap != nil {
+		return json.Marshal(resource.ValueMap)
 	}
-	if resource.SpecRangeMap != nil {
-		return json.Marshal(resource.SpecRangeMap)
+	if resource.RangeMap != nil {
+		return json.Marshal(resource.RangeMap)
 	}
-	if resource.SpecRegexMap != nil {
-		return json.Marshal(resource.SpecRegexMap)
+	if resource.RegexMap != nil {
+		return json.Marshal(resource.RegexMap)
 	}
-	if resource.SpecSpecialValueMap != nil {
-		return json.Marshal(resource.SpecSpecialValueMap)
+	if resource.SpecialValueMap != nil {
+		return json.Marshal(resource.SpecialValueMap)
 	}
 
 	return nil, fmt.Errorf("no value for disjunction of refs")
 }
 
-// UnmarshalJSON implements a custom JSON unmarshalling logic to decode `DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap` from JSON.
-func (resource *DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialValueMap) UnmarshalJSON(raw []byte) error {
+// UnmarshalJSON implements a custom JSON unmarshalling logic to decode `DashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap` from JSON.
+func (resource *DashboardValueMapOrRangeMapOrRegexMapOrSpecialValueMap) UnmarshalJSON(raw []byte) error {
 	if raw == nil {
 		return nil
 	}
@@ -1977,36 +1846,36 @@ func (resource *DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialVa
 
 	switch discriminator {
 	case "range":
-		var specRangeMap SpecRangeMap
-		if err := json.Unmarshal(raw, &specRangeMap); err != nil {
+		var rangeMap RangeMap
+		if err := json.Unmarshal(raw, &rangeMap); err != nil {
 			return err
 		}
 
-		resource.SpecRangeMap = &specRangeMap
+		resource.RangeMap = &rangeMap
 		return nil
 	case "regex":
-		var specRegexMap SpecRegexMap
-		if err := json.Unmarshal(raw, &specRegexMap); err != nil {
+		var regexMap RegexMap
+		if err := json.Unmarshal(raw, &regexMap); err != nil {
 			return err
 		}
 
-		resource.SpecRegexMap = &specRegexMap
+		resource.RegexMap = &regexMap
 		return nil
 	case "special":
-		var specSpecialValueMap SpecSpecialValueMap
-		if err := json.Unmarshal(raw, &specSpecialValueMap); err != nil {
+		var specialValueMap SpecialValueMap
+		if err := json.Unmarshal(raw, &specialValueMap); err != nil {
 			return err
 		}
 
-		resource.SpecSpecialValueMap = &specSpecialValueMap
+		resource.SpecialValueMap = &specialValueMap
 		return nil
 	case "value":
-		var specValueMap SpecValueMap
-		if err := json.Unmarshal(raw, &specValueMap); err != nil {
+		var valueMap ValueMap
+		if err := json.Unmarshal(raw, &valueMap); err != nil {
 			return err
 		}
 
-		resource.SpecValueMap = &specValueMap
+		resource.ValueMap = &valueMap
 		return nil
 	}
 
@@ -2014,30 +1883,30 @@ func (resource *DashboardSpecValueMapOrSpecRangeMapOrSpecRegexMapOrSpecSpecialVa
 }
 
 // +k8s:openapi-gen=true
-type DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind struct {
-	SpecGridLayoutItemKind *DashboardspecGridLayoutItemKind `json:"SpecGridLayoutItemKind,omitempty"`
-	SpecGridLayoutRowKind  *DashboardspecGridLayoutRowKind  `json:"SpecGridLayoutRowKind,omitempty"`
+type DashboardGridLayoutItemKindOrGridLayoutRowKind struct {
+	GridLayoutItemKind *DashboardGridLayoutItemKind `json:"GridLayoutItemKind,omitempty"`
+	GridLayoutRowKind  *DashboardGridLayoutRowKind  `json:"GridLayoutRowKind,omitempty"`
 }
 
-// NewDashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind creates a new DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind object.
-func NewDashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind() *DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind {
-	return &DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind{}
+// NewDashboardGridLayoutItemKindOrGridLayoutRowKind creates a new DashboardGridLayoutItemKindOrGridLayoutRowKind object.
+func NewDashboardGridLayoutItemKindOrGridLayoutRowKind() *DashboardGridLayoutItemKindOrGridLayoutRowKind {
+	return &DashboardGridLayoutItemKindOrGridLayoutRowKind{}
 }
 
-// MarshalJSON implements a custom JSON marshalling logic to encode `DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind` as JSON.
-func (resource DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind) MarshalJSON() ([]byte, error) {
-	if resource.SpecGridLayoutItemKind != nil {
-		return json.Marshal(resource.SpecGridLayoutItemKind)
+// MarshalJSON implements a custom JSON marshalling logic to encode `DashboardGridLayoutItemKindOrGridLayoutRowKind` as JSON.
+func (resource DashboardGridLayoutItemKindOrGridLayoutRowKind) MarshalJSON() ([]byte, error) {
+	if resource.GridLayoutItemKind != nil {
+		return json.Marshal(resource.GridLayoutItemKind)
 	}
-	if resource.SpecGridLayoutRowKind != nil {
-		return json.Marshal(resource.SpecGridLayoutRowKind)
+	if resource.GridLayoutRowKind != nil {
+		return json.Marshal(resource.GridLayoutRowKind)
 	}
 
 	return nil, fmt.Errorf("no value for disjunction of refs")
 }
 
-// UnmarshalJSON implements a custom JSON unmarshalling logic to decode `DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind` from JSON.
-func (resource *DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind) UnmarshalJSON(raw []byte) error {
+// UnmarshalJSON implements a custom JSON unmarshalling logic to decode `DashboardGridLayoutItemKindOrGridLayoutRowKind` from JSON.
+func (resource *DashboardGridLayoutItemKindOrGridLayoutRowKind) UnmarshalJSON(raw []byte) error {
 	if raw == nil {
 		return nil
 	}
@@ -2055,60 +1924,22 @@ func (resource *DashboardSpecGridLayoutItemKindOrSpecGridLayoutRowKind) Unmarsha
 
 	switch discriminator {
 	case "GridLayoutItem":
-		var specGridLayoutItemKind SpecGridLayoutItemKind
-		if err := json.Unmarshal(raw, &specGridLayoutItemKind); err != nil {
+		var gridLayoutItemKind GridLayoutItemKind
+		if err := json.Unmarshal(raw, &gridLayoutItemKind); err != nil {
 			return err
 		}
 
-		resource.SpecGridLayoutItemKind = &specGridLayoutItemKind
+		resource.GridLayoutItemKind = &gridLayoutItemKind
 		return nil
 	case "GridLayoutRow":
-		var specGridLayoutRowKind SpecGridLayoutRowKind
-		if err := json.Unmarshal(raw, &specGridLayoutRowKind); err != nil {
+		var gridLayoutRowKind GridLayoutRowKind
+		if err := json.Unmarshal(raw, &gridLayoutRowKind); err != nil {
 			return err
 		}
 
-		resource.SpecGridLayoutRowKind = &specGridLayoutRowKind
+		resource.GridLayoutRowKind = &gridLayoutRowKind
 		return nil
 	}
 
 	return fmt.Errorf("could not unmarshal resource with `kind = %v`", discriminator)
-}
-
-// +k8s:openapi-gen=true
-type DashboardStringOrBoolOrFloat64OrSpecCustomVariableValueOrArrayOfSpecVariableValueSingle struct {
-	String                         *string                                    `json:"String,omitempty"`
-	Bool                           *bool                                      `json:"Bool,omitempty"`
-	Float64                        *float64                                   `json:"Float64,omitempty"`
-	SpecCustomVariableValue        *DashboardDashboardspecCustomVariableValue `json:"SpecCustomVariableValue,omitempty"`
-	ArrayOfSpecVariableValueSingle []DashboardspecVariableValueSingle         `json:"ArrayOfSpecVariableValueSingle,omitempty"`
-}
-
-// NewDashboardStringOrBoolOrFloat64OrSpecCustomVariableValueOrArrayOfSpecVariableValueSingle creates a new DashboardStringOrBoolOrFloat64OrSpecCustomVariableValueOrArrayOfSpecVariableValueSingle object.
-func NewDashboardStringOrBoolOrFloat64OrSpecCustomVariableValueOrArrayOfSpecVariableValueSingle() *DashboardStringOrBoolOrFloat64OrSpecCustomVariableValueOrArrayOfSpecVariableValueSingle {
-	return &DashboardStringOrBoolOrFloat64OrSpecCustomVariableValueOrArrayOfSpecVariableValueSingle{}
-}
-
-// +k8s:openapi-gen=true
-type DashboardStringOrBoolOrFloat64OrSpecCustomVariableValue struct {
-	String                  *string                                    `json:"String,omitempty"`
-	Bool                    *bool                                      `json:"Bool,omitempty"`
-	Float64                 *float64                                   `json:"Float64,omitempty"`
-	SpecCustomVariableValue *DashboardDashboardspecCustomVariableValue `json:"SpecCustomVariableValue,omitempty"`
-}
-
-// NewDashboardStringOrBoolOrFloat64OrSpecCustomVariableValue creates a new DashboardStringOrBoolOrFloat64OrSpecCustomVariableValue object.
-func NewDashboardStringOrBoolOrFloat64OrSpecCustomVariableValue() *DashboardStringOrBoolOrFloat64OrSpecCustomVariableValue {
-	return &DashboardStringOrBoolOrFloat64OrSpecCustomVariableValue{}
-}
-
-// +k8s:openapi-gen=true
-type DashboardStringOrSpecVariableCustomFormatterFn struct {
-	String                        *string                                 `json:"String,omitempty"`
-	SpecVariableCustomFormatterFn *DashboardspecVariableCustomFormatterFn `json:"SpecVariableCustomFormatterFn,omitempty"`
-}
-
-// NewDashboardStringOrSpecVariableCustomFormatterFn creates a new DashboardStringOrSpecVariableCustomFormatterFn object.
-func NewDashboardStringOrSpecVariableCustomFormatterFn() *DashboardStringOrSpecVariableCustomFormatterFn {
-	return &DashboardStringOrSpecVariableCustomFormatterFn{}
 }

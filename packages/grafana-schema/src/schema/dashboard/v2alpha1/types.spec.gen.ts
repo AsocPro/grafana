@@ -1,8 +1,5 @@
 // Code generated - EDITING IS FUTILE. DO NOT EDIT.
 
-import * as common from '../common';
-
-
 // "Off" for no shared crosshair or tooltip (default).
 // "Crosshair" for shared crosshair.
 // "Tooltip" for shared crosshair AND shared tooltip.
@@ -646,7 +643,7 @@ export interface DataTransformerConfig {
 	// Optional frame matcher. When missing it will be applied to all results
 	filter?: MatcherConfig;
 	// Where to pull DataFrames from as input to transformation
-	topic?: common.DataTopic;
+	topic?: DataTopic;
 	// Options to be passed to the transformer
 	// Valid options depend on the transformer id
 	options: any;
@@ -669,6 +666,16 @@ export interface MatcherConfig {
 export const defaultMatcherConfig = (): MatcherConfig => ({
 	id: "",
 });
+
+// A topic is attached to DataFrame metadata in query results.
+// This specifies where the data should be used.
+export enum DataTopic {
+	Series = "series",
+	Annotations = "annotations",
+	AlertStates = "alertStates",
+}
+
+export const defaultDataTopic = (): DataTopic => (DataTopic.Series);
 
 export interface QueryOptionsSpec {
 	timeFrom?: string;
@@ -1176,124 +1183,6 @@ export interface RowRepeatOptions {
 export const defaultRowRepeatOptions = (): RowRepeatOptions => ({
 	mode: RepeatMode,
 	value: "",
-});
-
-// Supported value mapping types
-// `value`: Maps text values to a color or different display text and color. For example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.
-// `range`: Maps numerical ranges to a display text and color. For example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.
-// `regex`: Maps regular expressions to replacement text and a color. For example, if a value is www.example.com, you can configure a regex value mapping so that Grafana displays www and truncates the domain.
-// `special`: Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color. See SpecialValueMatch to see the list of special values. For example, you can configure a special value mapping so that null values appear as N/A.
-export enum MappingType {
-	ValueToText = "value",
-	RangeToText = "range",
-	RegexToText = "regex",
-	SpecialValue = "special",
-}
-
-export const defaultMappingType = (): MappingType => (MappingType.ValueToText);
-
-// --- Common types ---
-export interface Kind {
-	kind: string;
-	spec: any;
-	metadata?: any;
-}
-
-export const defaultKind = (): Kind => ({
-	kind: "",
-	spec: {},
-});
-
-// Variable types
-export type VariableValue = VariableValueSingle | VariableValueSingle[];
-
-export const defaultVariableValue = (): VariableValue => (defaultVariableValueSingle());
-
-export type VariableValueSingle = string | boolean | number | CustomVariableValue;
-
-export const defaultVariableValueSingle = (): VariableValueSingle => ("");
-
-// Custom variable value
-export interface CustomVariableValue {
-	// The format name or function used in the expression
-	formatter: string | VariableCustomFormatterFn;
-}
-
-export const defaultCustomVariableValue = (): CustomVariableValue => ({
-	formatter: "",
-});
-
-// Custom formatter function
-export interface VariableCustomFormatterFn {
-	value: any;
-	legacyVariableModel: {
-		name: string;
-		type: VariableType;
-		multi: boolean;
-		includeAll: boolean;
-	};
-	legacyDefaultFormatter?: VariableCustomFormatterFn;
-}
-
-export const defaultVariableCustomFormatterFn = (): VariableCustomFormatterFn => ({
-	value: {},
-	legacyVariableModel: {
-	name: "",
-	type: VariableType.Query,
-	multi: false,
-	includeAll: false,
-},
-});
-
-// Dashboard variable type
-// `query`: Query-generated list of values such as metric names, server names, sensor IDs, data centers, and so on.
-// `adhoc`: Key/value filters that are automatically added to all metric queries for a data source (Prometheus, Loki, InfluxDB, and Elasticsearch only).
-// `constant`: 	Define a hidden constant.
-// `datasource`: Quickly change the data source for an entire dashboard.
-// `interval`: Interval variables represent time spans.
-// `textbox`: Display a free text input field with an optional default value.
-// `custom`: Define the variable options manually using a comma-separated list.
-// `system`: Variables defined by Grafana. See: https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/#global-variables
-export enum VariableType {
-	Query = "query",
-	Adhoc = "adhoc",
-	Groupby = "groupby",
-	Constant = "constant",
-	Datasource = "datasource",
-	Interval = "interval",
-	Textbox = "textbox",
-	Custom = "custom",
-	System = "system",
-	Snapshot = "snapshot",
-}
-
-export const defaultVariableType = (): VariableType => (VariableType.Query);
-
-// Custom formatter variable
-export interface CustomFormatterVariable {
-	name: string;
-	type: VariableType;
-	multi: boolean;
-	includeAll: boolean;
-}
-
-export const defaultCustomFormatterVariable = (): CustomFormatterVariable => ({
-	name: "",
-	type: VariableType.Query,
-	multi: false,
-	includeAll: false,
-});
-
-// FIXME: should we introduce this? --- Variable value option
-export interface VariableValueOption {
-	label: string;
-	value: VariableValueSingle;
-	group?: string;
-}
-
-export const defaultVariableValueOption = (): VariableValueOption => ({
-	label: "",
-	value: defaultVariableValueSingle(),
 });
 
 export interface Spec {

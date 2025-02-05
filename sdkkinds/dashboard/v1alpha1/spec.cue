@@ -3,6 +3,6 @@ package v1alpha1
 // TODO: this outputs nothing.
 // For now, we use unstructured for the spec,
 // but it cannot be produced by the SDK codegen.
-DashboardSpec: [string]: _ & {
+Spec: [string]: _ & {
 	title: string
 }
